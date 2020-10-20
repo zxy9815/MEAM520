@@ -315,6 +315,7 @@ def isValidConfig(q, obstacles):
     ax.scatter3D(link3[:,0],link3[:,1],link3[:,2],color='b')
     ax.scatter3D(link4[:,0],link4[:,1],link4[:,2],color='y')
     ax.scatter3D(link5[:,0],link5[:,1],link5[:,2],color='m')
+    ax.plot(points[:,0],points[:,1],points[:,2],'k')
     
     # ax.scatter3D(points[0,0],points[0,1],points[0,2],color='r')
     # ax.scatter3D(points[1,0],points[1,1],points[1,2],color='b')
