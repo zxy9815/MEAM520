@@ -164,7 +164,26 @@ def rrt(map, start, goal):
         raise Exception("No Path Found. ")
 
 
-
+def makeRectangle(p,v,u):
+    """
+    Find the vertices of a rectangle centered around point p given 
+    axes u and v perpendicular to its normal and edges
+    p:          1x3 array, position of the center
+    u:          1x3 array, points forward or down, depending on the link
+    v:          1x3 array, points into the plane of the page, usually
+    
+    return:     4x3 array, each row contains the coordinates of a vertex
+    
+    Credit to stackexchange for this algorithm:
+    https://math.stackexchange.com/questions/2518607/how-to-find-vertices-of-a-rectangle-when-center-coordinates-and-angle-of-tilt-is
+    """
+    vert = np.zeros((4,3))
+    vert[0,:] = p - u + v
+    vert[1,:] = p + u + v
+    vert[2,:] = p + u - v
+    vert[3,:] = p - u - v
+    
+    return vert
 
 
 
@@ -181,8 +200,20 @@ def isValidConfig(q, obstacles):
 
     beg_ind = [0,1,2,3,4]
     end_ind = [1,2,3,4,5]
+	
+	# Define the space of link 1: ####################################
+    delta1 = 10 # depth of link 1, mm (TODO: measure this)
+    w1 = 10 # width of link 1, mm (TODO: measure this)
+    u1 = np.array([delta1*np.cos(q[0]),delta1*np.sin(q[0]),0]) # points in direction of x1
+    v1 = np.array([-w1*np.sin(q[0]),w1*np.cos(q[0]),0])# points in the direction of z1
+    link1Lower = makeRectangle(points[0,:],u1,v1) # rectangle at joint 1
+    link1Upper = makeRectangle(points[1,:],u1,v1) # rectangle at joint 2
+    # TODO: make function to build the pairs of points whose lines you should check
+	
 
-    #Check for all links and obstacles
+	
+
+    #Check for all links and obstacles #################################
     for i in range(len(beg_ind)):
         for j in range(len(obstacles)):
 
