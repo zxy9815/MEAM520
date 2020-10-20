@@ -4,6 +4,8 @@ import random
 from calculateFK import calculateFK
 from detectCollision import detectCollision
 from loadmap import loadmap
+import matplotlib.pyplot as plt
+from mpl_toolkits import mplot3d
 
 def rrt(map, start, goal):
     """
@@ -164,26 +166,90 @@ def rrt(map, start, goal):
         raise Exception("No Path Found. ")
 
 
-def makeRectangle(p,v,u):
+def makeRectangle(points,q,joint,delta,w,rot=0):
     """
     Find the vertices of a rectangle centered around point p given 
     axes u and v perpendicular to its normal and edges
-    p:          1x3 array, position of the center
-    u:          1x3 array, points forward or down, depending on the link
-    v:          1x3 array, points into the plane of the page, usually
+    points:     6x3 array, joint positions
+    q:          1x6 array, joint values
+    joint:      integer, which link to find the rectangle for. NOT ZERO-INDEXED
+    delta:      float, the depth of the link
+    w:          float, the width of the link
+    rot:        extra rotation for link 5 and end effector
     
-    return:     4x3 array, each row contains the coordinates of a vertex
+    return:     8x3 array, each row contains the coordinates of a vertex for the box
     
     Credit to stackexchange for this algorithm:
     https://math.stackexchange.com/questions/2518607/how-to-find-vertices-of-a-rectangle-when-center-coordinates-and-angle-of-tilt-is
     """
-    vert = np.zeros((4,3))
-    vert[0,:] = p - u + v
-    vert[1,:] = p + u + v
-    vert[2,:] = p + u - v
-    vert[3,:] = p - u - v
+    
+    l = points[joint,:] - points[joint-1,:]
+    
+    v = np.cross(l,np.array([np.cos(q[0]),np.sin(q[0]),0]))
+    v = v / np.linalg.norm(v) * w
+    
+    u = np.cross(v,l)
+    u = u / np.linalg.norm(u) * delta
+    
+    if (rot): # if it's a joint that rotates with theta5:
+        normal = np.linalg.norm(l)
+        x = l[0] / normal
+        y = l[1] / normal
+        z = l[2] / normal
+        c = np.cos(rot)
+        s = np.sin(rot)
+        C = 1 - c
+        
+        R = np.array([[x*x*C + c, x*y*C - z*s, x*z*C + y*s],
+                      [y*x*C+z*s, y*y*C + c, y*z*C - x*s],
+                      [z*x*C-y*s, z*y*C+x*s, z*z*C + c]])
+        u = R @ u.T
+        v = R @ v.T
+        print(u.shape)
+    
+    vert = np.zeros((8,3))
+    p1  = points[joint,:]
+    vert[0,:] = p1 - u + v
+    vert[1,:] = p1 + u + v
+    vert[2,:] = p1 + u - v
+    vert[3,:] = p1 - u - v
+    
+    p2 = points[joint-1,:]
+    vert[4,:] = p2 - u + v
+    vert[5,:] = p2 + u + v
+    vert[6,:] = p2 + u - v
+    vert[7,:] = p2 - u - v
     
     return vert
+
+# TODO: remove this before submission. Just used for debugging
+def set_axes_equal(ax):
+    '''Make axes of 3D plot have equal scale so that spheres appear as spheres,
+    cubes as cubes, etc..  This is one possible solution to Matplotlib's
+    ax.set_aspect('equal') and ax.axis('equal') not working for 3D.
+
+    Input
+      ax: a matplotlib axis, e.g., as output from plt.gca().
+    '''
+
+    x_limits = ax.get_xlim3d()
+    y_limits = ax.get_ylim3d()
+    z_limits = ax.get_zlim3d()
+
+    x_range = abs(x_limits[1] - x_limits[0])
+    x_middle = np.mean(x_limits)
+    y_range = abs(y_limits[1] - y_limits[0])
+    y_middle = np.mean(y_limits)
+    z_range = abs(z_limits[1] - z_limits[0])
+    z_middle = np.mean(z_limits)
+
+    # The plot bounding box is a sphere in the sense of the infinity
+    # norm, hence I call half the max range the plot radius.
+    plot_radius = 0.5*max([x_range, y_range, z_range])
+
+    ax.set_xlim3d([x_middle - plot_radius, x_middle + plot_radius])
+    ax.set_ylim3d([y_middle - plot_radius, y_middle + plot_radius])
+    ax.set_zlim3d([z_middle - plot_radius, z_middle + plot_radius])
 
 
 
@@ -202,16 +268,54 @@ def isValidConfig(q, obstacles):
     end_ind = [1,2,3,4,5]
 	
 	# Define the space of link 1: ####################################
-    delta1 = 10 # depth of link 1, mm (TODO: measure this)
-    w1 = 10 # width of link 1, mm (TODO: measure this)
-    u1 = np.array([delta1*np.cos(q[0]),delta1*np.sin(q[0]),0]) # points in direction of x1
-    v1 = np.array([-w1*np.sin(q[0]),w1*np.cos(q[0]),0])# points in the direction of z1
-    link1Lower = makeRectangle(points[0,:],u1,v1) # rectangle at joint 1
-    link1Upper = makeRectangle(points[1,:],u1,v1) # rectangle at joint 2
+    delta1  = 10 # depth of link 1, mm (TODO: measure this)
+    w1      = 20 # width of link 1, mm (TODO: measure this)
+    
+    link1 = makeRectangle(points,q,1,delta1,w1) # rectangle at joint 1
     # TODO: make function to build the pairs of points whose lines you should check
-	
+    
 
-	
+    # Define the space of link 2: ####################################
+    delta2  = 10
+    w2      = 20
+    link2 = makeRectangle(points,q,2,delta2,w2)
+    
+    # Define the space of link 3: ####################################
+    delta3  = 10
+    w3      = 20
+    link3 = makeRectangle(points,q,3,delta3,w3)
+    
+    # Define the space of link 4: ####################################
+    delta4  = 10
+    w4      = 20
+    link4 = makeRectangle(points,q,4,delta4,w4)
+    
+    # Define the space of link 4: ####################################
+    delta5  = 10
+    w5      = 20
+    link5 = makeRectangle(points,q,5,delta5,w5,rot=q[4])
+    
+
+    print(q)
+    plt.figure()
+    ax = plt.axes(projection='3d')
+    ax.scatter3D(link1[:,0],link1[:,1],link1[:,2],color='r')
+    ax.scatter3D(link2[:,0],link2[:,1],link2[:,2],color='g')
+    ax.scatter3D(link3[:,0],link3[:,1],link3[:,2],color='b')
+    ax.scatter3D(link4[:,0],link4[:,1],link4[:,2],color='y')
+    ax.scatter3D(link5[:,0],link5[:,1],link5[:,2],color='m')
+    
+    # ax.scatter3D(points[0,0],points[0,1],points[0,2],color='r')
+    # ax.scatter3D(points[1,0],points[1,1],points[1,2],color='b')
+    # ax.scatter3D(points[2,0],points[2,1],points[2,2],color='b')
+    
+    # ax.auto_scale_xyz([-100,100],[-100,100],[-100,100])
+    set_axes_equal(ax)
+    ax.set_xlabel('x')
+    ax.set_ylabel('y')
+    ax.set_zlabel('z')
+    plt.show()
+    
 
     #Check for all links and obstacles #################################
     for i in range(len(beg_ind)):
