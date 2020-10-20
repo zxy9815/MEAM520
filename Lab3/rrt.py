@@ -185,11 +185,23 @@ def makeRectangle(points,q,joint,delta,w,rot=0):
     
     l = points[joint,:] - points[joint-1,:]
     
-    v = np.cross(l,np.array([np.cos(q[0]),np.sin(q[0]),0]))
+    # rotate 90 degrees about z_1
+    x = np.sin(q[0])*np.sin(-np.pi/2)
+    y = -np.cos(q[0])*np.sin(-np.pi/2)
+    z = np.cos(-np.pi/2)
+    c = np.cos(np.pi/2)
+    s = np.sin(np.pi/2)
+    C = 1 - c
+    
+    R = np.array([[x*x*C + c, x*y*C - z*s, x*z*C + y*s],
+                  [y*x*C+z*s, y*y*C + c, y*z*C - x*s],
+                  [z*x*C-y*s, z*y*C+x*s, z*z*C + c]])
+    u = R @ l.T
+    u = u / np.linalg.norm(u) * delta
+    
+    v = np.cross(u,l)
     v = v / np.linalg.norm(v) * w
     
-    u = np.cross(v,l)
-    u = u / np.linalg.norm(u) * delta
     
     if (rot): # if it's a joint that rotates with theta5:
         normal = np.linalg.norm(l)
