@@ -290,7 +290,7 @@ def isValidConfig(q, obstacles):
     w4      = 20
     link4 = makeRectangle(points,q,4,delta4,w4)
     
-    # Define the space of link 4: ####################################
+    # Define the space of link 5: ####################################
     delta5  = 10
     w5      = 20
     link5 = makeRectangle(points,q,5,delta5,w5,rot=q[4])
