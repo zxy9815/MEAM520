@@ -205,7 +205,6 @@ def makeRectangle(points,q,joint,delta,w,rot=0):
                       [z*x*C-y*s, z*y*C+x*s, z*z*C + c]])
         u = R @ u.T
         v = R @ v.T
-        print(u.shape)
     
     vert = np.zeros((8,3))
     p1  = points[joint,:]
