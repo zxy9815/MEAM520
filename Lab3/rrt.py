@@ -1,7 +1,9 @@
+#!/usr/bin/python2
 import numpy as np
 import random
 from calculateFK import calculateFK
 from detectCollision import detectCollision
+from loadmap import loadmap
 
 def rrt(map, start, goal):
     """
@@ -21,6 +23,7 @@ def rrt(map, start, goal):
     #Max iterations
     n_iter = 1000
     isPath = False
+    fk = calculateFK()
 
     #################################
     #Initialize 2 graphs in C-space
@@ -39,93 +42,95 @@ def rrt(map, start, goal):
     for iter_ in range(n_iter):
         #Pick a random point btw limits
         q_rand = np.random.uniform(low=lowerLim, high=upperLim, size=(1,6))
+        q_rand = np.reshape(q_rand, -1)
 
         #Check if random q is valid
         num_rand = 1
         while not isValidConfig(q_rand, obstacles):
             q_rand = np.random.uniform(low=lowerLim, high=upperLim, size=(1,6))
+            q_rand = np.reshape(q_rand, -1)
             num_rand += 1
             if(num_rand > n_iter):
                 print("cannot find a valid config")
                 return
-        
+
         ###########################################
         #Find closest node from start tree
         dist_s = []
         for node in V_start:
             #measure by L2 distance in C-space
-            d = np.sum(np.power((q_rand - node),2))
+            d = np.max(np.abs(q_rand - node))
             dist_s.append(d)
-        
+
         ind_a = np.argmin(dist_s)
         q_a = V_start[ind_a,:]
 
         #Check if (q_rand, q_a) has collision
         isCollide_a = False
-        pt_rand, ~ = calculateFK.forward(q_rand)
-        pt_a, ~ = calculateFK.forward(q_a)
+        pt_rand, t0e = fk.forward(q_rand)
+        pt_a, t0e = fk.forward(q_a)
 
         for i in range(1,6):
             for j in range(len(obstacles)):
-                begin_pt = pt_a[i,:]
-                end_pt = pt_rand[i,:]
+                begin_pt = pt_a[i,:].reshape((1,3))
+                end_pt = pt_rand[i,:].reshape((1,3))
                 isCollide = detectCollision(begin_pt, end_pt, obstacles[j,:])
 
                 if(any(isCollide)):
-                    print("qa qrand collide with ", j)
+                    print("qa qrand collide with obstacle number ", j)
                     isCollide_a = True
                     break
-        
+
         #if not collide, add new edge and node
         if not isCollide_a:
             new_edge = np.array([ind_a, len(V_start)]).reshape((1,2))
             E_start = np.append(E_start, new_edge, axis=0)
-            V_start = np.append(V_start, q_rand, axis=0)
-        
+            V_start = np.append(V_start, q_rand.reshape((1,6)), axis=0)
+
         ##################################################
         #Find closest node from end tree
         dist_s = []
         for node in V_goal:
             #measure by L2 distance in C-space
-            d = np.sum(np.power((q_rand - node),2))
+            d = np.max(np.abs(q_rand - node))
             dist_s.append(d)
-        
+
         ind_b = np.argmin(dist_s)
         q_b = V_goal[ind_b,:]
 
         #Check if (q_rand, q_b) has collision
         isCollide_b = False
-        pt_b, ~ = calculateFK.forward(q_b)
+        pt_b, t0e = fk.forward(q_b)
 
         for i in range(1,6):
             for j in range(len(obstacles)):
-                begin_pt = pt_rand[i,:]
-                end_pt = pt_b[i,:]
+                begin_pt = pt_rand[i,:].reshape((1,3))
+                end_pt = pt_b[i,:].reshape((1,3))
                 isCollide = detectCollision(begin_pt, end_pt, obstacles[j,:])
 
                 if(any(isCollide)):
-                    print("qb qrand collide with ", j)
+                    print("qb qrand collide with obstacle number", j)
                     isCollide_b = True
                     break
-        
+
         #if not collide, add new edge and node
         if not isCollide_b:
             new_edge = np.array([ind_b, len(V_goal)]).reshape((1,2))
             E_goal = np.append(E_goal, new_edge, axis=0)
-            V_goal = np.append(V_goal, q_rand, axis=0)
+            V_goal = np.append(V_goal, q_rand.reshape((1,6)), axis=0)
 
         #if connect to both trees, then a path is found!
         if not isCollide_a and not isCollide_b:
             print("Path found!")
             isPath = True
             break
-    
+
     ###################################
     #Backtrack
     if isPath:
         #init path as mid node
         path = V_goal[-1,:].reshape((1,6))
-        
+
         #Add path from start to mid
         #get parent of mid
         ind1 = E_start[-1, 0]
@@ -136,7 +141,7 @@ def rrt(map, start, goal):
                 if(E_start[row,1] == ind1):
                     ind1 = E_start[row, 0]
                     break
-        
+
         #insert start
         path = np.insert(path,0,start.reshape((1, 6)),axis=0)
 
@@ -150,13 +155,14 @@ def rrt(map, start, goal):
                 if(E_goal[row,1] == ind2):
                     ind2 = E_goal[row, 0]
                     break
-        
+
         #append goal
         path = np.append(path,goal.reshape((1, 6)),axis=0)
+        print(path)
         return path
     else:
         raise Exception("No Path Found. ")
-            
+
 
 
 
@@ -169,8 +175,9 @@ def isValidConfig(q, obstacles):
     :obstacles          location of all boxes (Nx6) [xmin, ymin, zmin, xmax, ymax, zmax]
     :return:            True if valid configuration, else false
     """
-
-    points, T0e = calculateFK.forward(q)
+    fk = calculateFK()
+    q = np.reshape(q,-1)
+    points, T0e = fk.forward(q)
 
     beg_ind = [0,1,2,3,4]
     end_ind = [1,2,3,4,5]
@@ -180,17 +187,24 @@ def isValidConfig(q, obstacles):
         for j in range(len(obstacles)):
 
             #Get Link coordinates and check if collide with box[j]
-            begin_pt = points[beg_ind[i],:]
-            end_pt = points[end_ind[i],:]
+            begin_pt = points[beg_ind[i],:].reshape((1,3))
+            end_pt = points[end_ind[i],:].reshape((1,3))
             isCollide = detectCollision(begin_pt, end_pt, obstacles[j,:])
 
             if(any(isCollide)):
                 return False
-    
+
     #check if gripper finger is in collision
 
 
     return True
 
 
+if __name__=='__main__':
+    # Update map location with the location of the target map
+    map_struct = loadmap("maps/map1.txt")
+    start = np.array([0,  0, 0, 0, 0, 0])
+    goal = np.array([0, 0, 1.1, 0, 0, 0])
 
+    # Run Astar code
+    path = rrt(map_struct, start, goal)
