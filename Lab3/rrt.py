@@ -279,21 +279,23 @@ def isValidConfig(q, obstacles):
     beg_ind = [0,1,2,3,4]
     end_ind = [1,2,3,4,5]
     
+    buffer = 5 # buffer to add to all links
+    
 	
     # Define the space of link 1: ####################################
-    delta1  = 27.4 # half the depth of link 1, mm 
-    w1      = 27.4 # half the width of link 1, mm 
+    delta1  = 27.4 + buffer # half the depth of link 1, mm 
+    w1      = 27.4 + buffer # half the width of link 1, mm 
     link1 = makeRectangle(points,q,1,delta1,w1) # rectangle at joint 1
     
 
     # Define the space of link 2: ####################################
-    delta2  = 10.3
-    w2      = 33.3
+    delta2  = 10.3 + buffer
+    w2      = 33.3 + buffer
     link2 = makeRectangle(points,q,2,delta2,w2)
     
     # Define the space of link 3: ####################################
-    delta3  = 15.5
-    w3      = 24.5
+    delta3  = 15.5 + buffer
+    w3      = 24.5 + buffer
     # define special case for the bit of the lynx sticking out its back:
     l = points[3,:] - points[2,:]
     l = l / np.linalg.norm(l) # unit vector pointing in direction of link 3
@@ -302,21 +304,21 @@ def isValidConfig(q, obstacles):
     link3 = makeRectangle(link3Points,q,1,delta3,w3)
     
     # Define the space of link 4: ####################################
-    delta4  = 15.5
-    w4      = 30.1
+    delta4  = 15.5 + buffer
+    w4      = 30.1 + buffer
     link4 = makeRectangle(points,q,4,delta4,w4)
     
     # Define the space of link 5: ####################################
-    delta5  = 27.3
-    w5      = 10.5
+    delta5  = 27.3 + buffer
+    w5      = 10.5 + buffer
     link5 = makeRectangle(points,q,5,delta5,w5,rot=q[4])
     
     # Define the space of end effector: ##############################
     if (q[5] >=0):
-        deltaEE = 5.2 + q[5]
+        deltaEE = 5.2 + q[5] + buffer
     else:
-        deltaEE = 5.2
-    wEE = 10.5
+        deltaEE = 5.2 + buffer
+    wEE = 10.5 + buffer
     # have to make a new point for the tip of the end effector:
     l = points[-1,:] - points[4,:] 
     l = l / np.linalg.norm(l) # the unit vector pointing in the direction of the ee
