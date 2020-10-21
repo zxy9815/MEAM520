@@ -322,7 +322,6 @@ def isValidConfig(q, obstacles):
     l = l / np.linalg.norm(l) # the unit vector pointing in the direction of the ee
     l = l * 12.5 # the length of the end effector tips
     eePoints = np.array([points[-1,:],points[-1,:]+l])
-    print(eePoints)
     linkEE = makeRectangle(eePoints,q,1,deltaEE,wEE,rot=q[4]) # use end effector points
     
     
@@ -337,31 +336,26 @@ def isValidConfig(q, obstacles):
         for obs in range(len(obstacles)):
             isCollide = detectCollision(link[startPtIdx],link[endPtIdx],obstacles[obs])
             if(any(isCollide)):
-                pass
+                return False
     
 
-    print(q)
-    plt.figure()
-    ax = plt.axes(projection='3d')
-    ax.scatter3D(link1[:,0],link1[:,1],link1[:,2],color='r')
-    ax.scatter3D(link2[:,0],link2[:,1],link2[:,2],color='g')
-    ax.scatter3D(link3[:,0],link3[:,1],link3[:,2],color='b')
-    ax.scatter3D(link4[:,0],link4[:,1],link4[:,2],color='y')
-    ax.scatter3D(link5[:,0],link5[:,1],link5[:,2],color='m')
-    ax.scatter3D(linkEE[:,0],linkEE[:,1],linkEE[:,2],color='c')
-    ax.plot(points[:,0],points[:,1],points[:,2],'k')
-    ax.plot(eePoints[:,0],eePoints[:,1],eePoints[:,2],'k')
+    # print(q)
+    # plt.figure()
+    # ax = plt.axes(projection='3d')
+    # ax.scatter3D(link1[:,0],link1[:,1],link1[:,2],color='r')
+    # ax.scatter3D(link2[:,0],link2[:,1],link2[:,2],color='g')
+    # ax.scatter3D(link3[:,0],link3[:,1],link3[:,2],color='b')
+    # ax.scatter3D(link4[:,0],link4[:,1],link4[:,2],color='y')
+    # ax.scatter3D(link5[:,0],link5[:,1],link5[:,2],color='m')
+    # ax.scatter3D(linkEE[:,0],linkEE[:,1],linkEE[:,2],color='c')
+    # ax.plot(points[:,0],points[:,1],points[:,2],'k')
+    # ax.plot(eePoints[:,0],eePoints[:,1],eePoints[:,2],'k')
     
-    # ax.scatter3D(points[0,0],points[0,1],points[0,2],color='r')
-    # ax.scatter3D(points[1,0],points[1,1],points[1,2],color='b')
-    # ax.scatter3D(points[2,0],points[2,1],points[2,2],color='b')
-    
-    # ax.auto_scale_xyz([-100,100],[-100,100],[-100,100])
-    set_axes_equal(ax)
-    ax.set_xlabel('x')
-    ax.set_ylabel('y')
-    ax.set_zlabel('z')
-    plt.show()
+    # set_axes_equal(ax)
+    # ax.set_xlabel('x')
+    # ax.set_ylabel('y')
+    # ax.set_zlabel('z')
+    # plt.show()
     
 
     #Check for all links and obstacles #################################
