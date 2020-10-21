@@ -309,14 +309,16 @@ def isValidConfig(q, obstacles):
     
     # the index of the points in the rectangles that begin and end a line
     # the first four pairs are the lines along the length of the rectangle
-    # the last four pairs are the rectangles at the end of the prism
-    startPtIdx = np.array([0,1,2,3,0,1,2,3],dtype=np.int8)
-    endPtIdx   = np.array([4,5,6,7,1,2,3,0],dtype=np.int8)
+    # the last eight pairs are the rectangles at the end of the prism
+    startPtIdx = np.array([0,1,2,3,0,1,2,3,4,5,6,7],dtype=np.int8)
+    endPtIdx   = np.array([4,5,6,7,1,2,3,0,5,6,7,4],dtype=np.int8)
     
     # Test to see if any links collide with an obstacle
     for link in np.array([link1,link2,link3,link4,link5]): # TODO: add end effector
         for obs in range(len(obstacles)):
             isCollide = detectCollision(link[startPtIdx],link[endPtIdx],obstacles[obs])
+            if(any(isCollide)):
+                return False
     
 
     print(q)
