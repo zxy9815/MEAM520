@@ -179,13 +179,12 @@ def makeRectangle(points,q,joint,delta,w,rot=0):
     
     return:     8x3 array, each row contains the coordinates of a vertex for the box
     
-    Credit to stackexchange for this algorithm:
-    https://math.stackexchange.com/questions/2518607/how-to-find-vertices-of-a-rectangle-when-center-coordinates-and-angle-of-tilt-is
+    
     """
     
     l = points[joint,:] - points[joint-1,:]
     
-    # rotate 90 degrees about z_1
+    # rotate 90 degrees about z_1 to get u
     x = np.sin(q[0])*np.sin(-np.pi/2)
     y = -np.cos(q[0])*np.sin(-np.pi/2)
     z = np.cos(-np.pi/2)
@@ -218,6 +217,8 @@ def makeRectangle(points,q,joint,delta,w,rot=0):
         u = R @ u.T
         v = R @ v.T
     
+    # Credit to stackexchange for this algorithm in 2D space:
+    # https://math.stackexchange.com/questions/2518607/how-to-find-vertices-of-a-rectangle-when-center-coordinates-and-angle-of-tilt-is
     vert = np.zeros((8,3))
     p1  = points[joint,:]
     vert[0,:] = p1 - u + v
@@ -283,7 +284,6 @@ def isValidConfig(q, obstacles):
     w1      = 20 # width of link 1, mm (TODO: measure this)
     
     link1 = makeRectangle(points,q,1,delta1,w1) # rectangle at joint 1
-    # TODO: make function to build the pairs of points whose lines you should check
     
 
     # Define the space of link 2: ####################################
@@ -305,6 +305,18 @@ def isValidConfig(q, obstacles):
     delta5  = 10
     w5      = 20
     link5 = makeRectangle(points,q,5,delta5,w5,rot=q[4])
+    
+    
+    # the index of the points in the rectangles that begin and end a line
+    # the first four pairs are the lines along the length of the rectangle
+    # the last four pairs are the rectangles at the end of the prism
+    startPtIdx = np.array([0,1,2,3,0,1,2,3],dtype=np.int8)
+    endPtIdx   = np.array([4,5,6,7,1,2,3,0],dtype=np.int8)
+    
+    # Test to see if any links collide with an obstacle
+    for link in np.array([link1,link2,link3,link4,link5]): # TODO: add end effector
+        for obs in range(len(obstacles)):
+            isCollide = detectCollision(link[startPtIdx],link[endPtIdx],obstacles[obs])
     
 
     print(q)
