@@ -294,7 +294,12 @@ def isValidConfig(q, obstacles):
     # Define the space of link 3: ####################################
     delta3  = 15.5
     w3      = 24.5
-    link3 = makeRectangle(points,q,3,delta3,w3)
+    # define special case for the bit of the lynx sticking out its back:
+    l = points[3,:] - points[2,:]
+    l = l / np.linalg.norm(l) # unit vector pointing in direction of link 3
+    l = l * (-28.5) # rough distance to the back end
+    link3Points = np.array([points[2,:]+l,points[3]])
+    link3 = makeRectangle(link3Points,q,1,delta3,w3)
     
     # Define the space of link 4: ####################################
     delta4  = 15.5
