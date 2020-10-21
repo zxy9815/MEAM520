@@ -278,8 +278,9 @@ def isValidConfig(q, obstacles):
 
     beg_ind = [0,1,2,3,4]
     end_ind = [1,2,3,4,5]
+    
 	
-	# Define the space of link 1: ####################################
+    # Define the space of link 1: ####################################
     delta1  = 27.4 # half the depth of link 1, mm 
     w1      = 27.4 # half the width of link 1, mm 
     link1 = makeRectangle(points,q,1,delta1,w1) # rectangle at joint 1
@@ -305,6 +306,20 @@ def isValidConfig(q, obstacles):
     w5      = 10.5
     link5 = makeRectangle(points,q,5,delta5,w5,rot=q[4])
     
+    # Define the space of end effector: ##############################
+    if (q[5] >=0):
+        deltaEE = 5.2 + q[5]
+    else:
+        deltaEE = 5.2
+    wEE = 10.5
+    # have to make a new point for the tip of the end effector:
+    l = points[-1,:] - points[4,:] 
+    l = l / np.linalg.norm(l) # the unit vector pointing in the direction of the ee
+    l = l * 12.5 # the length of the end effector tips
+    eePoints = np.array([points[-1,:],points[-1,:]+l])
+    print(eePoints)
+    linkEE = makeRectangle(eePoints,q,1,deltaEE,wEE,rot=q[4]) # use end effector points
+    
     
     # the index of the points in the rectangles that begin and end a line
     # the first four pairs are the lines along the length of the rectangle
@@ -313,11 +328,11 @@ def isValidConfig(q, obstacles):
     endPtIdx   = np.array([4,5,6,7,1,2,3,0,5,6,7,4],dtype=np.int8)
     
     # Test to see if any links collide with an obstacle
-    for link in np.array([link1,link2,link3,link4,link5]): # TODO: add end effector
+    for link in np.array([link1,link2,link3,link4,link5,linkEE]):
         for obs in range(len(obstacles)):
             isCollide = detectCollision(link[startPtIdx],link[endPtIdx],obstacles[obs])
             if(any(isCollide)):
-                return False
+                pass
     
 
     print(q)
@@ -328,7 +343,9 @@ def isValidConfig(q, obstacles):
     ax.scatter3D(link3[:,0],link3[:,1],link3[:,2],color='b')
     ax.scatter3D(link4[:,0],link4[:,1],link4[:,2],color='y')
     ax.scatter3D(link5[:,0],link5[:,1],link5[:,2],color='m')
+    ax.scatter3D(linkEE[:,0],linkEE[:,1],linkEE[:,2],color='c')
     ax.plot(points[:,0],points[:,1],points[:,2],'k')
+    ax.plot(eePoints[:,0],eePoints[:,1],eePoints[:,2],'k')
     
     # ax.scatter3D(points[0,0],points[0,1],points[0,2],color='r')
     # ax.scatter3D(points[1,0],points[1,1],points[1,2],color='b')
