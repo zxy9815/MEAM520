@@ -280,30 +280,29 @@ def isValidConfig(q, obstacles):
     end_ind = [1,2,3,4,5]
 	
 	# Define the space of link 1: ####################################
-    delta1  = 10 # depth of link 1, mm (TODO: measure this)
-    w1      = 20 # width of link 1, mm (TODO: measure this)
-    
+    delta1  = 27.4 # half the depth of link 1, mm 
+    w1      = 27.4 # half the width of link 1, mm 
     link1 = makeRectangle(points,q,1,delta1,w1) # rectangle at joint 1
     
 
     # Define the space of link 2: ####################################
-    delta2  = 10
-    w2      = 20
+    delta2  = 10.3
+    w2      = 33.3
     link2 = makeRectangle(points,q,2,delta2,w2)
     
     # Define the space of link 3: ####################################
-    delta3  = 10
-    w3      = 20
+    delta3  = 15.5
+    w3      = 24.5
     link3 = makeRectangle(points,q,3,delta3,w3)
     
     # Define the space of link 4: ####################################
-    delta4  = 10
-    w4      = 20
+    delta4  = 15.5
+    w4      = 30.1
     link4 = makeRectangle(points,q,4,delta4,w4)
     
     # Define the space of link 5: ####################################
-    delta5  = 10
-    w5      = 20
+    delta5  = 27.3
+    w5      = 10.5
     link5 = makeRectangle(points,q,5,delta5,w5,rot=q[4])
     
     
