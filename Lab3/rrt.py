@@ -19,8 +19,8 @@ def rrt(map, start, goal):
     """
 
     #joint limits, gripper constant
-    lowerLim = np.array([-1.4, -1.2, -1.8, -1.9, -2.0, 0]).reshape((1, 6))    # Lower joint limits in radians (grip in mm (negative closes more firmly))
-    upperLim = np.array([1.4, 1.4, 1.7, 1.7, 1.5, 0]).reshape((1, 6))          # Upper joint limits in radians (grip in mm)
+    lowerLim = np.array([-1.4, -1.2, -1.8, -1.9, -2.0, -15]).reshape((1, 6))    # Lower joint limits in radians (grip in mm (negative closes more firmly))
+    upperLim = np.array([1.4, 1.4, 1.7, 1.7, 1.5, 30]).reshape((1, 6))          # Upper joint limits in radians (grip in mm)
 
     #Max iterations
     n_iter = 1000
