@@ -71,29 +71,26 @@ def rrt(map, start, goal):
 
         #Check if (q_rand, q_a) has collision
         isCollide_a = False
-        pt_rand, t0e = fk.forward(q_rand)
-        pt_a, t0e = fk.forward(q_a)
 
-        # for i in range(1,6):
-        #     for j in range(len(obstacles)):
-        #         begin_pt = pt_a[i,:].reshape((1,3))
-        #         end_pt = pt_rand[i,:].reshape((1,3))
-        #         isCollide = detectCollision(begin_pt, end_pt, obstacles[j,:])
+        #set 10 waypoints in C-space btw the 2 configs
+        waypoints = np.zeros((20,len(q_a)))
+        for i in range(len(q_a)):
+          waypoints[:,i] = np.linspace(q_a[i], q_rand[i], 20, endpoint=True)
+        #waypoints = np.linspace(q_a, q_rand, 10, endpoint=True)
 
-        #         if(any(isCollide)):
-        #             print("qa qrand collide with obstacle number ", j)
-        #             isCollide_a = True
-        #             break
+        for i in range(len(waypoints)-1):
+            #check collision for every consecutive pair of configs
+            pt_rand, t0e = fk.forward(waypoints[i])
+            pt_a, t0e = fk.forward(waypoints[i+1])
 
-        for j in range(len(obstacles)):
-            # begin_pt = pt_a[i,:].reshape((1,3))
-            # end_pt = pt_rand[i,:].reshape((1,3))
-            isCollide = detectCollision(pt_a, pt_rand, obstacles[j,:])
+            for j in range(len(obstacles)):
 
-            if(any(isCollide)):
-                print("qa qrand collide with obstacle number ", j)
-                isCollide_a = True
-                break
+                isCollide = detectCollision(pt_a, pt_rand, obstacles[j,:])
+
+                if(any(isCollide)):
+                    print("qa qrand collide with obstacle number ", j)
+                    isCollide_a = True
+                    break
 
         #if not collide, add new edge and node
         if not isCollide_a:
@@ -114,28 +111,26 @@ def rrt(map, start, goal):
 
         #Check if (q_rand, q_b) has collision
         isCollide_b = False
-        pt_b, t0e = fk.forward(q_b)
 
-        # for i in range(1,6):
-        #     for j in range(len(obstacles)):
-        #         begin_pt = pt_rand[i,:].reshape((1,3))
-        #         end_pt = pt_b[i,:].reshape((1,3))
-        #         isCollide = detectCollision(begin_pt, end_pt, obstacles[j,:])
+        #set 10 waypoints in C-space btw the 2 configs
+        waypoints_b = np.zeros((20,len(q_b)))
+        for i in range(len(q_b)):
+          waypoints_b[:,i] = np.linspace(q_rand[i], q_b[i], 20, endpoint=True)
+        #waypoints_b = np.linspace(q_rand, q_b, 10, endpoint=True)
 
-        #         if(any(isCollide)):
-        #             print("qb qrand collide with obstacle number", j)
-        #             isCollide_b = True
-        #             break
+        for i in range(len(waypoints_b)-1):
+            #check collision for every consecutive pair of configs
+            pt_rand, t0e = fk.forward(waypoints_b[i])
+            pt_b, t0e = fk.forward(waypoints_b[i+1])
 
-        for j in range(len(obstacles)):
-            # begin_pt = pt_rand[i,:].reshape((1,3))
-            # end_pt = pt_b[i,:].reshape((1,3))
-            isCollide = detectCollision(pt_rand, pt_b, obstacles[j,:])
+            for j in range(len(obstacles)):
 
-            if(any(isCollide)):
-                print("qb qrand collide with obstacle number", j)
-                isCollide_b = True
-                break
+                isCollide = detectCollision(pt_rand, pt_b, obstacles[j,:])
+
+                if(any(isCollide)):
+                    print("qb qrand collide with obstacle number ", j)
+                    isCollide_a = True
+                    break
 
         #if not collide, add new edge and node
         if not isCollide_b:

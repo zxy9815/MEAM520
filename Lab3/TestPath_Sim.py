@@ -17,9 +17,9 @@ from rrt import rrt
 
 if __name__=='__main__':
     # Update map location with the location of the target map
-    map_struct = loadmap("maps/map3.txt")
+    map_struct = loadmap("maps/map4.txt")
     start = np.array([0,  0, 0, 0, 0, 0])
-    goal = np.array([1.3, 0, 0, 0, 0, 0])
+    goal = np.array([0, -0.1, -0.8, 0, 0, 0])
 
     # Run Astar code
     #path = Astar(deepcopy(map_struct), deepcopy(start), deepcopy(goal))
@@ -46,7 +46,7 @@ if __name__=='__main__':
         while not reached_target:
             # Check if robot is collided then wait
             collision = collision or lynx.is_collided()
-            sleep(3)
+            sleep(5)
 
             # Add Student code here to decide if controller should send next
             # target or continue to wait. Do NOT add additional sleeps to control
