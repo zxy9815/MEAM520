@@ -335,8 +335,8 @@ def isValidConfig(q, obstacles):
 
 
     # Define the space of link 1: ####################################
-    delta1  = 27.4 + buffer # half the depth of link 1, mm
-    w1      = 27.4 + buffer # half the width of link 1, mm
+    delta1  = 50 + buffer # half the depth of link 1, mm
+    w1      = 50 + buffer # half the width of link 1, mm
     link1 = makeRectangle(points,q,1,delta1,w1) # rectangle at joint 1
 
 
