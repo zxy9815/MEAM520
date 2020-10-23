@@ -152,9 +152,9 @@ def rrt(map, start, goal):
                     break
                 
                 #Check tip of the gripper
-                e_rand = 12.5 * (pt_rand[-1,:] - pt_rand[4,:]) / np.linalg.norm(pt_rand[-1,:] - pt_rand[4,:])
+                e_rand = 12.5 * (pt_rand[-1,:] - pt_rand[4,:]) / np.linalg.norm(pt_rand[-1,:] - pt_rand[4,:]) + (pt_rand[-1,:] - pt_rand[4,:])
                 e_rand = np.reshape(e_rand, (1,3))
-                e_b = 12.5 * (pt_b[-1,:] - pt_b[4,:]) / np.linalg.norm(pt_b[-1,:] - pt_b[4,:])
+                e_b = 12.5 * (pt_b[-1,:] - pt_b[4,:]) / np.linalg.norm(pt_b[-1,:] - pt_b[4,:]) + (pt_rand[-1,:] - pt_rand[4,:])
                 e_b = np.reshape(e_b, (1,3))
                 
                 if(any(detectCollision(e_b, e_rand, obstacles[j,:]))):
