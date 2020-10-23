@@ -374,7 +374,7 @@ def isValidConfig(q, obstacles):
     # have to make a new point for the tip of the end effector:
     l = points[-1,:] - points[4,:]
     l = l / np.linalg.norm(l) # the unit vector pointing in the direction of the ee
-    l = l * 12.5 # the length of the end effector tips
+    l = l * 12.5 + buffer# the length of the end effector tips
     eePoints = np.array([points[-1,:],points[-1,:]+l])
     linkEE = makeRectangle(eePoints,q,1,deltaEE,wEE,rot=q[4]) # use end effector points
 
