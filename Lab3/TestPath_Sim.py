@@ -20,9 +20,10 @@ import timeit
 
 if __name__=='__main__':
     # Update map location with the location of the target map
-    map_struct = loadmap("maps/map1.txt")
+    map_struct = loadmap("maps/map4.txt")
     start = np.array([0,  0, 0, 0, 0, 0])
-    goal = np.array([0, 0, 1.1, 0, 0, 0])
+    #goal = np.array([0, -0.3, -0.3, 0, 0, 0])
+    goal = np.array([-1.3, 0.1, 0.5, 0, 0, 0])
 
     #Start timing
     start_time = timeit.default_timer()
@@ -66,15 +67,16 @@ if __name__=='__main__':
             count = count + 1
 
             pos, vel = lynx.get_state()
-            if(np.sum(np.abs(pos - q)) < 0.01):
+            if(np.abs(np.sum(pos - q)) < 0.01):
                 reached_target = True
                 print("going to the next target")
 
             elif(collision):
+                print("Robot collided during move")
                 sleep(3)
                 break
 
-            elif(count > 8):
+            elif(count > 3):
                 reached_target = True
 
             # End of student code

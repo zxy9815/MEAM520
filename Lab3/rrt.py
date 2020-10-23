@@ -1,4 +1,4 @@
-#!/usr/bin/python2
+
 import numpy as np
 import random
 from calculateFK import calculateFK
@@ -73,49 +73,16 @@ def rrt(map, start, goal):
         isCollide_a = False
 
         #set 20 waypoints in C-space btw the 2 configs
-        waypoints = np.zeros((20,len(q_a)))
+        waypoints = np.zeros((10,len(q_a)))
         for i in range(len(q_a)):
-          waypoints[:,i] = np.linspace(q_a[i], q_rand[i], 20, endpoint=True)
-        #waypoints = np.linspace(q_a, q_rand, 10, endpoint=True)
-        
+          waypoints[:,i] = np.linspace(q_a[i], q_rand[i], 10, endpoint=True)
+
         for config in range(len(waypoints)):
             isCollide = not(isValidConfig(waypoints[config],obstacles))
             if(isCollide):
                 print("qa qrand collide with obstacle")
                 isCollide_a = True
                 break
-
-        # for i in range(len(waypoints)-1):
-        #     #check collision for every consecutive pair of configs
-        #     pt_rand, t0e = fk.forward(waypoints[i])
-        #     pt_a, t0e = fk.forward(waypoints[i+1])
-
-        #     for j in range(len(obstacles)):
-        #         #Check pair of waypoints for every joint
-        #         isCollide = detectCollision(pt_a, pt_rand, obstacles[j,:])
-
-        #         if(any(isCollide)):
-        #             print("qa qrand collide with obstacle number ", j)
-        #             isCollide_a = True
-        #             break
-                
-        #         #Check tip of the gripper
-        #         e_rand = 12.5 * (pt_rand[-1,:] - pt_rand[4,:]) / np.linalg.norm(pt_rand[-1,:] - pt_rand[4,:])
-        #         e_rand = np.reshape(e_rand, (1,3))
-        #         e_a = 12.5 * (pt_a[-1,:] - pt_a[4,:]) / np.linalg.norm(pt_a[-1,:] - pt_a[4,:])
-        #         e_a = np.reshape(e_a, (1,3))
-                
-        #         if(any(detectCollision(e_a, e_rand, obstacles[j,:]))):
-        #             isCollide_a = True
-        #             break
-                
-        #         #Check self-collision with base (Assume Base is rectangular, length = width = 50mm, height = 76.2mm)
-        #         base_obs = np.array([-50, -50, 0, 50, 50, 76.2])
-
-        #         #Skip first 2 joints when checking base collision
-        #         if(any(detectCollision(pt_a[2:,:], pt_rand[2:,:], base_obs))):
-        #             isCollide_a = True
-        #             break
 
 
         #if not collide, add new edge and node
@@ -139,47 +106,17 @@ def rrt(map, start, goal):
         isCollide_b = False
 
         #set 10 waypoints in C-space btw the 2 configs
-        waypoints_b = np.zeros((20,len(q_b)))
+        waypoints_b = np.zeros((10,len(q_b)))
         for i in range(len(q_b)):
-          waypoints_b[:,i] = np.linspace(q_rand[i], q_b[i], 20, endpoint=True)
-        #waypoints_b = np.linspace(q_rand, q_b, 10, endpoint=True)
+          waypoints_b[:,i] = np.linspace(q_rand[i], q_b[i], 10, endpoint=True)
         
+
         for config in range(len(waypoints_b)):
             isCollide = not(isValidConfig(waypoints_b[config],obstacles))
             if(isCollide):
                 print("qb qrand collide with obstacle")
                 isCollide_b = True
                 break
-
-        # for i in range(len(waypoints_b)-1):
-        #     #check collision for every consecutive pair of configs
-        #     pt_rand, t0e = fk.forward(waypoints_b[i])
-        #     pt_b, t0e = fk.forward(waypoints_b[i+1])
-
-        #     for j in range(len(obstacles)):
-
-        #         isCollide = detectCollision(pt_rand, pt_b, obstacles[j,:])
-
-        #         if(any(isCollide)):
-        #             print("qb qrand collide with obstacle number ", j)
-        #             isCollide_b = True
-        #             break
-                
-        #         #Check tip of the gripper
-        #         e_rand = 12.5 * (pt_rand[-1,:] - pt_rand[4,:]) / np.linalg.norm(pt_rand[-1,:] - pt_rand[4,:]) + (pt_rand[-1,:] - pt_rand[4,:])
-        #         e_rand = np.reshape(e_rand, (1,3))
-        #         e_b = 12.5 * (pt_b[-1,:] - pt_b[4,:]) / np.linalg.norm(pt_b[-1,:] - pt_b[4,:]) + (pt_rand[-1,:] - pt_rand[4,:])
-        #         e_b = np.reshape(e_b, (1,3))
-                
-        #         if(any(detectCollision(e_b, e_rand, obstacles[j,:]))):
-        #             isCollide_b = True
-        #             break
-                
-        #         #Check self-collision with base (Assume Base is rectangular, length = width = 50mm, height = 76.2mm)
-        #         base_obs = np.array([-50, -50, 0, 50, 50, 76.2])
-        #         if(any(detectCollision(pt_b[2:,:], pt_rand[2:,:], base_obs))):
-        #             isCollide_b = True
-        #             break
 
         #if not collide, add new edge and node
         if not isCollide_b:
@@ -226,6 +163,7 @@ def rrt(map, start, goal):
 
         #append goal
         path = np.append(path,goal.reshape((1, 6)),axis=0)
+        print("RRT Path")
         print(path)
         return path
     else:
@@ -447,12 +385,3 @@ def isValidConfig(q, obstacles):
 
     return True
 
-
-if __name__=='__main__':
-    # Update map location with the location of the target map
-    map_struct = loadmap("maps/map1.txt")
-    start = np.array([0,  0, 0, 0, 0, 0])
-    goal = np.array([0, 0, 1.1, 0, 0, 0])
-
-    # Run Astar code
-    path = rrt(map_struct, start, goal)
