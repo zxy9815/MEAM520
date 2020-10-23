@@ -77,38 +77,45 @@ def rrt(map, start, goal):
         for i in range(len(q_a)):
           waypoints[:,i] = np.linspace(q_a[i], q_rand[i], 20, endpoint=True)
         #waypoints = np.linspace(q_a, q_rand, 10, endpoint=True)
+        
+        for config in range(len(waypoints)):
+            isCollide = not(isValidConfig(waypoints[config],obstacles))
+            if(any(isCollide)):
+                print("qa qrand collide with obstacle")
+                isCollide_a = True
+                break
 
-        for i in range(len(waypoints)-1):
-            #check collision for every consecutive pair of configs
-            pt_rand, t0e = fk.forward(waypoints[i])
-            pt_a, t0e = fk.forward(waypoints[i+1])
+        # for i in range(len(waypoints)-1):
+        #     #check collision for every consecutive pair of configs
+        #     pt_rand, t0e = fk.forward(waypoints[i])
+        #     pt_a, t0e = fk.forward(waypoints[i+1])
 
-            for j in range(len(obstacles)):
-                #Check pair of waypoints for every joint
-                isCollide = detectCollision(pt_a, pt_rand, obstacles[j,:])
+        #     for j in range(len(obstacles)):
+        #         #Check pair of waypoints for every joint
+        #         isCollide = detectCollision(pt_a, pt_rand, obstacles[j,:])
 
-                if(any(isCollide)):
-                    print("qa qrand collide with obstacle number ", j)
-                    isCollide_a = True
-                    break
+        #         if(any(isCollide)):
+        #             print("qa qrand collide with obstacle number ", j)
+        #             isCollide_a = True
+        #             break
                 
-                #Check tip of the gripper
-                e_rand = 12.5 * (pt_rand[-1,:] - pt_rand[4,:]) / np.linalg.norm(pt_rand[-1,:] - pt_rand[4,:])
-                e_rand = np.reshape(e_rand, (1,3))
-                e_a = 12.5 * (pt_a[-1,:] - pt_a[4,:]) / np.linalg.norm(pt_a[-1,:] - pt_a[4,:])
-                e_a = np.reshape(e_a, (1,3))
+        #         #Check tip of the gripper
+        #         e_rand = 12.5 * (pt_rand[-1,:] - pt_rand[4,:]) / np.linalg.norm(pt_rand[-1,:] - pt_rand[4,:])
+        #         e_rand = np.reshape(e_rand, (1,3))
+        #         e_a = 12.5 * (pt_a[-1,:] - pt_a[4,:]) / np.linalg.norm(pt_a[-1,:] - pt_a[4,:])
+        #         e_a = np.reshape(e_a, (1,3))
                 
-                if(any(detectCollision(e_a, e_rand, obstacles[j,:]))):
-                    isCollide_a = True
-                    break
+        #         if(any(detectCollision(e_a, e_rand, obstacles[j,:]))):
+        #             isCollide_a = True
+        #             break
                 
-                #Check self-collision with base (Assume Base is rectangular, length = width = 50mm, height = 76.2mm)
-                base_obs = np.array([-50, -50, 0, 50, 50, 76.2])
+        #         #Check self-collision with base (Assume Base is rectangular, length = width = 50mm, height = 76.2mm)
+        #         base_obs = np.array([-50, -50, 0, 50, 50, 76.2])
 
-                #Skip first 2 joints when checking base collision
-                if(any(detectCollision(pt_a[2:,:], pt_rand[2:,:], base_obs))):
-                    isCollide_a = True
-                    break
+        #         #Skip first 2 joints when checking base collision
+        #         if(any(detectCollision(pt_a[2:,:], pt_rand[2:,:], base_obs))):
+        #             isCollide_a = True
+        #             break
 
 
         #if not collide, add new edge and node
@@ -136,36 +143,43 @@ def rrt(map, start, goal):
         for i in range(len(q_b)):
           waypoints_b[:,i] = np.linspace(q_rand[i], q_b[i], 20, endpoint=True)
         #waypoints_b = np.linspace(q_rand, q_b, 10, endpoint=True)
+        
+        for config in range(len(waypoints_b)):
+            isCollide = not(isValidConfig(waypoints_b[config],obstacles))
+            if(any(isCollide)):
+                print("qb qrand collide with obstacle")
+                isCollide_b = True
+                break
 
-        for i in range(len(waypoints_b)-1):
-            #check collision for every consecutive pair of configs
-            pt_rand, t0e = fk.forward(waypoints_b[i])
-            pt_b, t0e = fk.forward(waypoints_b[i+1])
+        # for i in range(len(waypoints_b)-1):
+        #     #check collision for every consecutive pair of configs
+        #     pt_rand, t0e = fk.forward(waypoints_b[i])
+        #     pt_b, t0e = fk.forward(waypoints_b[i+1])
 
-            for j in range(len(obstacles)):
+        #     for j in range(len(obstacles)):
 
-                isCollide = detectCollision(pt_rand, pt_b, obstacles[j,:])
+        #         isCollide = detectCollision(pt_rand, pt_b, obstacles[j,:])
 
-                if(any(isCollide)):
-                    print("qb qrand collide with obstacle number ", j)
-                    isCollide_b = True
-                    break
+        #         if(any(isCollide)):
+        #             print("qb qrand collide with obstacle number ", j)
+        #             isCollide_b = True
+        #             break
                 
-                #Check tip of the gripper
-                e_rand = 12.5 * (pt_rand[-1,:] - pt_rand[4,:]) / np.linalg.norm(pt_rand[-1,:] - pt_rand[4,:]) + (pt_rand[-1,:] - pt_rand[4,:])
-                e_rand = np.reshape(e_rand, (1,3))
-                e_b = 12.5 * (pt_b[-1,:] - pt_b[4,:]) / np.linalg.norm(pt_b[-1,:] - pt_b[4,:]) + (pt_rand[-1,:] - pt_rand[4,:])
-                e_b = np.reshape(e_b, (1,3))
+        #         #Check tip of the gripper
+        #         e_rand = 12.5 * (pt_rand[-1,:] - pt_rand[4,:]) / np.linalg.norm(pt_rand[-1,:] - pt_rand[4,:]) + (pt_rand[-1,:] - pt_rand[4,:])
+        #         e_rand = np.reshape(e_rand, (1,3))
+        #         e_b = 12.5 * (pt_b[-1,:] - pt_b[4,:]) / np.linalg.norm(pt_b[-1,:] - pt_b[4,:]) + (pt_rand[-1,:] - pt_rand[4,:])
+        #         e_b = np.reshape(e_b, (1,3))
                 
-                if(any(detectCollision(e_b, e_rand, obstacles[j,:]))):
-                    isCollide_b = True
-                    break
+        #         if(any(detectCollision(e_b, e_rand, obstacles[j,:]))):
+        #             isCollide_b = True
+        #             break
                 
-                #Check self-collision with base (Assume Base is rectangular, length = width = 50mm, height = 76.2mm)
-                base_obs = np.array([-50, -50, 0, 50, 50, 76.2])
-                if(any(detectCollision(pt_b[2:,:], pt_rand[2:,:], base_obs))):
-                    isCollide_b = True
-                    break
+        #         #Check self-collision with base (Assume Base is rectangular, length = width = 50mm, height = 76.2mm)
+        #         base_obs = np.array([-50, -50, 0, 50, 50, 76.2])
+        #         if(any(detectCollision(pt_b[2:,:], pt_rand[2:,:], base_obs))):
+        #             isCollide_b = True
+        #             break
 
         #if not collide, add new edge and node
         if not isCollide_b:
@@ -391,6 +405,11 @@ def isValidConfig(q, obstacles):
             isCollide = detectCollision(link[startPtIdx],link[endPtIdx],obstacles[obs])
             if(any(isCollide)):
                 return False
+    for link in np.array([link3,link4,link5,linkEE]):
+        isCollide = detectCollision(link[startPtIdx],link[endPtIdx],np.array([-50, -50, 0, 50, 50, 76.2]))
+        if(any(isCollide)):
+            print("Lynx collides with base frame")
+            return False
 
 
     # print(q)
@@ -412,18 +431,17 @@ def isValidConfig(q, obstacles):
     # plt.show()
 
 
-    #Check for all links and obstacles #################################
-    for i in range(len(beg_ind)):
-        for j in range(len(obstacles)):
+    # #Check for all links and obstacles #################################
+    # for i in range(len(beg_ind)):
+    #     for j in range(len(obstacles)):
 
-            #Get Link coordinates and check if collide with box[j]
-            begin_pt = points[beg_ind[i],:].reshape((1,3))
-            end_pt = points[end_ind[i],:].reshape((1,3))
-            isCollide = detectCollision(begin_pt, end_pt, obstacles[j,:])
+    #         #Get Link coordinates and check if collide with box[j]
+    #         begin_pt = points[beg_ind[i],:].reshape((1,3))
+    #         end_pt = points[end_ind[i],:].reshape((1,3))
+    #         isCollide = detectCollision(begin_pt, end_pt, obstacles[j,:])
 
-            if(any(isCollide)):
-                return False
-
+    #         if(any(isCollide)):
+    #             return False
     #check if gripper finger is in collision
 
 
