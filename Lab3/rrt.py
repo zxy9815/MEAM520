@@ -238,35 +238,6 @@ def makeRectangle(points,q,joint,delta,w,rot=0):
 
     return vert
 
-# TODO: remove this before submission. Just used for debugging
-def set_axes_equal(ax):
-    '''Make axes of 3D plot have equal scale so that spheres appear as spheres,
-    cubes as cubes, etc..  This is one possible solution to Matplotlib's
-    ax.set_aspect('equal') and ax.axis('equal') not working for 3D.
-
-    Input
-      ax: a matplotlib axis, e.g., as output from plt.gca().
-    '''
-
-    x_limits = ax.get_xlim3d()
-    y_limits = ax.get_ylim3d()
-    z_limits = ax.get_zlim3d()
-
-    x_range = abs(x_limits[1] - x_limits[0])
-    x_middle = np.mean(x_limits)
-    y_range = abs(y_limits[1] - y_limits[0])
-    y_middle = np.mean(y_limits)
-    z_range = abs(z_limits[1] - z_limits[0])
-    z_middle = np.mean(z_limits)
-
-    # The plot bounding box is a sphere in the sense of the infinity
-    # norm, hence I call half the max range the plot radius.
-    plot_radius = 0.5*max([x_range, y_range, z_range])
-
-    ax.set_xlim3d([x_middle - plot_radius, x_middle + plot_radius])
-    ax.set_ylim3d([y_middle - plot_radius, y_middle + plot_radius])
-    ax.set_zlim3d([z_middle - plot_radius, z_middle + plot_radius])
-
 
 
 def isValidConfig(q, obstacles):
@@ -280,17 +251,12 @@ def isValidConfig(q, obstacles):
     q = np.reshape(q,-1)
     points, T0e = fk.forward(q)
 
-    beg_ind = [0,1,2,3,4]
-    end_ind = [1,2,3,4,5]
-
     buffer = 5 # buffer to add to all links
-
 
     # Define the space of link 1: ####################################
     delta1  = 50 + buffer # half the depth of link 1, mm
     w1      = 50 + buffer # half the width of link 1, mm
     link1 = makeRectangle(points,q,1,delta1,w1) # rectangle at joint 1
-
 
     # Define the space of link 2: ####################################
     delta2  = 10.3 + buffer
@@ -348,40 +314,6 @@ def isValidConfig(q, obstacles):
         if(any(isCollide)):
             print("Lynx collides with base frame")
             return False
-
-
-    # print(q)
-    # plt.figure()
-    # ax = plt.axes(projection='3d')
-    # ax.scatter3D(link1[:,0],link1[:,1],link1[:,2],color='r')
-    # ax.scatter3D(link2[:,0],link2[:,1],link2[:,2],color='g')
-    # ax.scatter3D(link3[:,0],link3[:,1],link3[:,2],color='b')
-    # ax.scatter3D(link4[:,0],link4[:,1],link4[:,2],color='y')
-    # ax.scatter3D(link5[:,0],link5[:,1],link5[:,2],color='m')
-    # ax.scatter3D(linkEE[:,0],linkEE[:,1],linkEE[:,2],color='c')
-    # ax.plot(points[:,0],points[:,1],points[:,2],'k')
-    # ax.plot(eePoints[:,0],eePoints[:,1],eePoints[:,2],'k')
-
-    # set_axes_equal(ax)
-    # ax.set_xlabel('x')
-    # ax.set_ylabel('y')
-    # ax.set_zlabel('z')
-    # plt.show()
-
-
-    # #Check for all links and obstacles #################################
-    # for i in range(len(beg_ind)):
-    #     for j in range(len(obstacles)):
-
-    #         #Get Link coordinates and check if collide with box[j]
-    #         begin_pt = points[beg_ind[i],:].reshape((1,3))
-    #         end_pt = points[end_ind[i],:].reshape((1,3))
-    #         isCollide = detectCollision(begin_pt, end_pt, obstacles[j,:])
-
-    #         if(any(isCollide)):
-    #             return False
-    #check if gripper finger is in collision
-
 
     return True
 
