@@ -80,7 +80,7 @@ def rrt(map, start, goal):
         
         for config in range(len(waypoints)):
             isCollide = not(isValidConfig(waypoints[config],obstacles))
-            if(any(isCollide)):
+            if(isCollide):
                 print("qa qrand collide with obstacle")
                 isCollide_a = True
                 break
@@ -146,7 +146,7 @@ def rrt(map, start, goal):
         
         for config in range(len(waypoints_b)):
             isCollide = not(isValidConfig(waypoints_b[config],obstacles))
-            if(any(isCollide)):
+            if(isCollide):
                 print("qb qrand collide with obstacle")
                 isCollide_b = True
                 break
