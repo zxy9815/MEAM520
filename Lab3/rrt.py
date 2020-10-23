@@ -103,7 +103,7 @@ def rrt(map, start, goal):
                     break
                 
                 #Check self-collision with base (Assume Base is rectangular, length = width = 50mm, height = 76.2mm)
-                base_obs = np.array([-25, -25, 0, 25, 25, 76.2])
+                base_obs = np.array([-50, -50, 0, 50, 50, 76.2])
 
                 #Skip first 2 joints when checking base collision
                 if(any(detectCollision(pt_a[2:,:], pt_rand[2:,:], base_obs))):
@@ -162,7 +162,7 @@ def rrt(map, start, goal):
                     break
                 
                 #Check self-collision with base (Assume Base is rectangular, length = width = 50mm, height = 76.2mm)
-                base_obs = np.array([-25, -25, 0, 25, 25, 76.2])
+                base_obs = np.array([-50, -50, 0, 50, 50, 76.2])
                 if(any(detectCollision(pt_b[2:,:], pt_rand[2:,:], base_obs))):
                     isCollide_b = True
                     break
