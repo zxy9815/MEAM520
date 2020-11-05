@@ -21,30 +21,30 @@ def IK_velocity (q, v, omega, joint):
     d5 = 68                        # Distance between joint 3 and joint 5
     lg = 0                         # Distance between joint 5 and end effector (gripper length)
 
+    dq = np.array([0,0,0,0,0,0])
+    
     # handle joints 0 and 1:
     if ((joint == 1) or (joint == 0)):
-        dq = np.array([0,0,0,0,0,0])
         return dq
 
-    # Test if it's possible to achieve the exact input velocities v and omega
-    # If so, dq should be the joint velocities to achieve that.
+    
     
     
     xi = np.concatenate((v,omega),axis=0)
     #TODO: implement test
     J = calcJacobians(q, joint)
     
+    # If any inputs in v or omega contain NaN, then the velocity can be anything
     
+    # Test if it's possible to achieve the exact input velocities v and omega
+    # If so, dq should be the joint velocities to achieve that.
+    # if not, it should be the least squares solution
     if not(np.linalg.matrix_rank(J) == np.linalg.matrix_rank(np.append(J,np.array([xi]).T,axis=1))):
         print('Infeasible velocities.')
-    
-    Jplus = np.linalg.pinv(J.T @ J) @ J.T # dq = Jplus @ [v; omega]
-    dq = np.linalg.pinv(J) @ xi
-    
-    # If not possible to get exact input velocities v and omega:
-    # dq should be joint velocities that minimize least squared error btwn result and desired
-    
-    # If any inputs in v or omega contain NaN, then the velocity can be anything
+        dq = np.linalg.pinv(J) @ xi
+    else:
+        dq = np.linalg.inv(J) @ xi
+    # Jplus = np.linalg.pinv(J.T @ J) @ J.T # dq = Jplus @ [v; omega]
     
     return dq
 
@@ -177,7 +177,6 @@ if __name__=='__main__':
     # joint 1 velocity
     # v = np.array([0,0,0])
     # omega = np.array([0,0,0])
-    
     
     
     joint = 6
