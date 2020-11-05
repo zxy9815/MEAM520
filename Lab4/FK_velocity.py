@@ -51,15 +51,15 @@ def calcJacobians (q, joint):
 
     #Case trcking world or base frame
     if(joint == 0 or joint == 1):
-        return np.zeros((6,5))
+        return np.zeros((6,6)) # 6x6 because the input q for IK is 1x6
     
     #Get Cross Product Components Jvi = [Z_i-1 X (O_frame - O_i-1)]
     frame = joint - 1
     t_frame = getTransformMat(q,frame)
-    O_frame = t_frame[0:3,-1]
+    O_frame = t_frame[0:3,-1] # TODO: make sure this is right for joint 5, which isn't located at frame 4
 
     #Linear Jacobian
-    Jv = np.zeros((3,5))
+    Jv = np.zeros((3,6))
 
     for i in range(frame):
         t_prev = getTransformMat(q,i)
@@ -70,7 +70,7 @@ def calcJacobians (q, joint):
         Jv[:,i] = np.cross(Z_prev, (O_frame - O_prev))
 
     #Angular Jacobian
-    Jw = np.zeros((3,5))
+    Jw = np.zeros((3,6))
 
     #Jwi = [Z_i-1]
     for i in range(frame):
