@@ -49,9 +49,137 @@ def IK_velocity (q, v, omega, joint):
     return dq
 
 if __name__=='__main__':
+    # do the tests in the zero position because it's easy.
     q = np.array([0,0,0,0,0,0])
-    velocity = np.array([0,255.325,0])
+    
+    # for all joint movements, IK should give a unit output for that joint
+    # joint 1 moves #############################
+    # end effector (joint 6) velocity:
+    v = np.array([0,255.325,0])
     omega = np.array([0,0,1])
+    
+    # joint 5 velocity
+    # v = np.array([0,187.325+34,0])
+    # omega = np.array([0,0,1])
+    
+    # joint 4 velocity
+    # v = np.array([0,187.325,0])
+    # omega = np.array([0,0,1])
+    
+    # joint 3 velocity 
+    # v = np.array([0,0,0])
+    # omega = np.array([0,0,1])
+    
+    # joint 2 velocity
+    # v = np.array([0,0,0])
+    # omega = np.array([0,0,1])
+    
+    # joint 1 velocity
+    # v = np.array([0,0,0])
+    # omega = np.array([0,0,0])
+    
+    # joint 2 moves #############################
+    # end effector (joint 6) velocity:
+    # v = np.array([146.05,0,-255.325])
+    # omega = np.array([0,1,0])
+    
+    # joint 5 velocity
+    # v = np.array([146.05,0,-187.325-34])
+    # omega = np.array([0,1,0])
+    
+    # joint 4 velocity
+    # v = np.array([146.05,0,-187.325])
+    # omega = np.array([0,1,0])
+    
+    # joint 3 velocity 
+    # v = np.array([146.05,0,0])
+    # omega = np.array([0,1,0])
+    
+    # joint 2 velocity
+    # v = np.array([0,0,0])
+    # omega = np.array([0,0,0])
+    
+    # joint 1 velocity
+    # v = np.array([0,0,0])
+    # omega = np.array([0,0,0])
+    
+    # joint 3 moves #############################
+    # end effector (joint 6) velocity:
+    # v = np.array([0,0,-255.325])
+    # omega = np.array([0,1,0])
+    
+    # joint 5 velocity
+    # v = np.array([0,0,-187.325-34])
+    # omega = np.array([0,1,0])
+    
+    # joint 4 velocity
+    # v = np.array([0,0,-187.325])
+    # omega = np.array([0,1,0])
+    
+    # joint 3 velocity 
+    # v = np.array([0,0,0])
+    # omega = np.array([0,0,0])
+    
+    # joint 2 velocity
+    # v = np.array([0,0,0])
+    # omega = np.array([0,0,0])
+    
+    # joint 1 velocity
+    # v = np.array([0,0,0])
+    # omega = np.array([0,0,0])
+    
+    # joint 4 moves #############################
+    # end effector (joint 6) velocity:
+    # v = np.array([0,0,-68])
+    # omega = np.array([0,1,0])
+    
+    # joint 5 velocity
+    # v = np.array([0,0,-34])
+    # omega = np.array([0,1,0])
+    
+    # joint 4 velocity
+    # v = np.array([0,0,0])
+    # omega = np.array([0,0,0])
+    
+    # joint 3 velocity 
+    # v = np.array([0,0,0])
+    # omega = np.array([0,0,0])
+    
+    # joint 2 velocity
+    # v = np.array([0,0,0])
+    # omega = np.array([0,0,0])
+    
+    # joint 1 velocity
+    # v = np.array([0,0,0])
+    # omega = np.array([0,0,0])
+    
+    # joint 5 moves #############################
+    # end effector (joint 6) velocity:
+    # v = np.array([0,0,0])
+    # omega = np.array([1,0,0])
+    
+    # joint 5 velocity
+    # v = np.array([0,0,0])
+    # omega = np.array([0,0,0])
+    
+    # joint 4 velocity
+    # v = np.array([0,0,0])
+    # omega = np.array([0,0,0])
+    
+    # joint 3 velocity 
+    # v = np.array([0,0,0])
+    # omega = np.array([0,0,0])
+    
+    # joint 2 velocity
+    # v = np.array([0,0,0])
+    # omega = np.array([0,0,0])
+    
+    # joint 1 velocity
+    # v = np.array([0,0,0])
+    # omega = np.array([0,0,0])
+    
+    
+    
     joint = 6
     np.set_printoptions(suppress=True)
-    print(IK_velocity(q,velocity,omega,joint))
+    print(IK_velocity(q,v,omega,joint))
