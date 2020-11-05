@@ -29,8 +29,8 @@ def FK_velocity (q, dq, joint):
     J = calcJacobians(q, joint)
 
     #Ignore q6 as it does not affector velocities
-    Joint_v = np.zeros((5,1))
-    Joint_v[:,0] = dq[0:5]
+    Joint_v = np.zeros((6,1))
+    Joint_v[:,0] = dq
 
     velocities = np.matmul(J, Joint_v)
 
@@ -56,7 +56,12 @@ def calcJacobians (q, joint):
     #Get Cross Product Components Jvi = [Z_i-1 X (O_frame - O_i-1)]
     frame = joint - 1
     t_frame = getTransformMat(q,frame)
-    O_frame = t_frame[0:3,-1] # TODO: make sure this is right for joint 5, which isn't located at frame 4
+    O_frame = t_frame[0:3,-1] 
+
+    #Handle the special case at joint 5
+    if(frame == 4):
+        trans_5 = np.matmul(t_frame, np.array([[0], [0], [34], [1]]))
+        O_frame = trans_5[0:3,-1]
 
     #Linear Jacobian
     Jv = np.zeros((3,6))
@@ -144,8 +149,8 @@ def getTransformMat(q, frame):
 if __name__=='__main__':
 
     q = [0,0,0,0,0,0]
-    dq = [1.,1.,1.,1.,0,0]
-    joint = 4
+    dq = [1.,0,0,0,0,0]
+    joint = 5
 
     v, omega = FK_velocity(q, dq, joint)
     print(v)
