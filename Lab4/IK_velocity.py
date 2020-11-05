@@ -29,10 +29,15 @@ def IK_velocity (q, v, omega, joint):
     # Test if it's possible to achieve the exact input velocities v and omega
     # If so, dq should be the joint velocities to achieve that.
     
+    
     xi = np.concatenate((v,omega),axis=0)
-    print(xi.shape)
     #TODO: implement test
     J = calcJacobians(q, joint)
+    
+    
+    if not(np.linalg.matrix_rank(J) == np.linalg.matrix_rank(np.append(J,np.array([xi]).T,axis=1))):
+        print('Infeasible velocities.')
+    
     Jplus = np.linalg.pinv(J.T @ J) @ J.T # dq = Jplus @ [v; omega]
     dq = np.linalg.pinv(J) @ xi
     
