@@ -148,9 +148,9 @@ def getTransformMat(q, frame):
 
 if __name__=='__main__':
 
-    q = [0,0,0,0,0,0]
-    dq = [1.,0,0,0,0,0]
-    joint = 5
+    q = [0.1,0.1,0.1,0.1,0.1,0]
+    dq = [1.,1.,1.,1.,1.,0]
+    joint = 6
 
     v, omega = FK_velocity(q, dq, joint)
     print(v)
