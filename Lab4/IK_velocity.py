@@ -198,7 +198,7 @@ if __name__=='__main__':
     qTitleStr = r'Joint Variable Changes Over Time for Moving the End Effector' + \
         '\n' + r'in the Negative $y$-Direction'
     fileName = 'Y_rot.png'
-    trajName = 'q_Y_rot.png'
+    trajName = 'Y_q_rot.png'
     
     # follow a line in the positive x direction, ignore orientation
     q0 = np.array([ 0,0,-np.pi/4,np.pi/4,0,0]) # start
@@ -209,7 +209,7 @@ if __name__=='__main__':
     qTitleStr = r'Joint Variable Changes Over Time for Moving the End Effector' + \
         '\n' + r'in the $x$-Direction'
     fileName = 'X_rot.png'
-    trajName = 'q_X_rot.png'
+    trajName = 'X_q_rot.png'
     
     # follow a line in the positive z direction, ignore orientation
     q0 = np.array([ 0,-np.pi/4,np.pi/4,0,0,0]) # start
@@ -220,8 +220,49 @@ if __name__=='__main__':
     qTitleStr = r'Joint Variable Changes Over Time for Moving the End Effector' + \
         '\n' + r'in the $z$-Direction'
     fileName = 'Z_rot.png'
-    trajName = 'q_Z_rot.png'
+    trajName = 'Z_q_rot.png'
     
+    # follow a line in the negative y direction, maintain orientation
+    q0 = np.array([ np.pi/4,0,-np.pi/4,np.pi/4,0,0]) # start
+    v = np.array([0,-1,0])
+    omega = np.array([0,0,0]) # maintain orientation
+    titleStr = r'End Effector Trajectory Beginning at $q=[\pi/4,0,-\pi/4,\pi/4,0,0]$' + \
+        '\n' + r' and Moving in the Negative $y$-Direction, Maintaining Orientation'
+    qTitleStr = r'Joint Variable Changes Over Time for Moving the End Effector' + \
+        '\n' + r'in the Negative $y$-Direction, Maintaining Orientation'
+    errTitleStr = r'Euclidean Norm of Orientation Deviation from Initial Orientation' + \
+        '\n' + r'Moving the End Effector in the Negative $y$-Direction, Maintaining Orientation'
+    fileName = 'Y_noRot.png'
+    trajName = 'Y_q_noRot.png'
+    errName = 'Y_noRot_err.png'
+    
+    # # follow a line in the positive x direction, maintain orientation
+    # q0 = np.array([ 0,0,-np.pi/4,np.pi/4,0,0]) # start
+    # v = np.array([1,0,0])
+    # omega = np.array([0,0,0]) # maintain orientation
+    # titleStr = r'End Effector Trajectory Beginning at $q=[0,0,-\pi/4,\pi/4,0,0]$' + \
+    #     '\n' + r' and Moving in the $x$-Direction, Maintaining Orientation'
+    # qTitleStr = r'Joint Variable Changes Over Time for Moving the End Effector' + \
+    #     '\n' + r'in the $x$-Direction, Maintaining Orientation'
+    # errTitleStr = r'Euclidean Norm of Orientation Deviation from Initial Orientation' + \
+    #     '\n' + r'Moving the End Effector in the $x$-Direction, Maintaining Orientation'
+    # fileName = 'X_noRot.png'
+    # trajName = 'q_X_noRot.png'
+    # errName = 'X_noRot_err.png'
+    
+    # # follow a line in the positive z direction, maintain orientation
+    q0 = np.array([ 0,-np.pi/4,np.pi/4,0,0,0]) # start
+    v = np.array([0,0,1])
+    omega = np.array([0,0,0]) # maintain orientation
+    titleStr = r'End Effector Trajectory Beginning at $q=[0,-\pi/4,\pi/4,0,0,0]$' + \
+        '\n' + r' and Moving in the $z$-Direction, Maintaining Orientation'
+    qTitleStr = r'Joint Variable Changes Over Time for Moving the End Effector' + \
+        '\n' + r'in the $z$-Direction, Maintaining Orientation'
+    errTitleStr = r'Euclidean Norm of Orientation Deviation from Initial Orientation' + \
+        '\n' + r'Moving the End Effector in the $z$-Direction, Maintaining Orientation'
+    fileName = 'Z_noRot.png'
+    trajName = 'Z_q_noRot.png'
+    errName = 'Z_noRot_err.png'
     
     
     
@@ -278,7 +319,7 @@ if __name__=='__main__':
     ax.set_title(titleStr,pad=4.0)
     ax.dist=11
     
-    plt.savefig('./figs/'+fileName,format='png',dpi=196)
+    plt.savefig('./figs/3dTraj/'+fileName,format='png',dpi=196)
     plt.show()
     
     
@@ -298,6 +339,25 @@ if __name__=='__main__':
     
     plt.savefig('./figs/'+trajName,format='png',dpi=196)
     plt.show()
+    
+    # plot error of orientation
+    if all(np.logical_not(omega)):
+        # find initial orientation
+        fk, T0e = fkCalc.forward(q[0,:])
+        orient0 = T0e[0:3,0:3]
+        error = np.empty_like(t)
+        for i in range(q.shape[0]):
+            T0e = fkCalc.forward(q[i,:])[1]
+            newOrient = T0e[0:3,0:3]
+            error[i] = np.linalg.norm(orient0-newOrient)
+        fig = plt.figure()
+        plt.plot(t,error,'k')
+        plt.xlabel(r'Time $t$ [seconds]')
+        plt.ylabel(r'2-norm deviation')
+        plt.title(errTitleStr)
+        
+        plt.savefig('./figs/Error/'+errName,format='png',dpi=196)
+        plt.show()
         
     # points
     # np.set_printoptions(suppress=True)
