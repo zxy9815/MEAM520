@@ -370,7 +370,7 @@ if __name__=='__main__':
     
     
     # Calculations ##############################
-    joint = 5
+    joint = 6
     
     # Linear Trajectories ######
     # n_sec = 5     # number of seconds to run the bot
