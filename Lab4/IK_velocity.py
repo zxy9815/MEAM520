@@ -236,7 +236,7 @@ if __name__=='__main__':
     trajName = 'Y_q_noRot.png'
     errName = 'Y_noRot_err.png'
     
-    # # follow a line in the positive x direction, maintain orientation
+    # follow a line in the positive x direction, maintain orientation
     # q0 = np.array([ 0,0,-np.pi/4,np.pi/4,0,0]) # start
     # v = np.array([1,0,0])
     # omega = np.array([0,0,0]) # maintain orientation
@@ -250,7 +250,7 @@ if __name__=='__main__':
     # trajName = 'q_X_noRot.png'
     # errName = 'X_noRot_err.png'
     
-    # # follow a line in the positive z direction, maintain orientation
+    # follow a line in the positive z direction, maintain orientation
     q0 = np.array([ 0,-np.pi/4,np.pi/4,0,0,0]) # start
     v = np.array([0,0,1])
     omega = np.array([0,0,0]) # maintain orientation
@@ -264,40 +264,134 @@ if __name__=='__main__':
     trajName = 'Z_q_noRot.png'
     errName = 'Z_noRot_err.png'
     
+    # Circular Trajectories #####################
+    # follow a circle in the yz plane
+    q0 = np.array([ 0,-np.pi/4,np.pi/4,0,0,0]) # start
+    v = np.array([0,-1,0])
+    omega = np.array([np.nan,np.nan,np.nan]) # don't care about orientation
+    titleStr = r'End Effector Trajectory Beginning at $q=[0,-\pi/4,\pi/4,0,0,0]$' + \
+        '\n' + r'and Moving in a Circle in the $yz$-Plane'
+    qTitleStr = r'Joint Variable Changes Over Time for Moving the End Effector' + \
+        '\n' + r'in a Circle in the $yz$-Plane'
+    fileName = 'YZ_rot.png'
+    trajName = 'YZ_q_rot.png'
+    
+    # follow a circle in the xz plane
+    q0 = np.array([ 0,-np.pi/4,np.pi/4,0,0,0]) # start
+    v = np.array([1,0,0])
+    omega = np.array([np.nan,np.nan,np.nan]) # don't care about orientation
+    titleStr = r'End Effector Trajectory Beginning at $q=[0,-\pi/4,\pi/4,0,0,0]$' + \
+        '\n' + r'and Moving in a Circle in the $xz$-Plane'
+    qTitleStr = r'Joint Variable Changes Over Time for Moving the End Effector' + \
+        '\n' + r'in a Circle in the $xz$-Plane'
+    fileName = 'XZ_rot.png'
+    trajName = 'XZ_q_rot.png'
+    rot = lambda theta: np.array([[np.cos(theta),0,np.sin(theta)],
+                                  [0,1,0],
+                                  [-np.sin(theta),0,np.cos(theta)]])
+    
+    # follow a circle in the xz plane, but closer to joint limits
+    q0 = np.array([ 0,-1.4,1.4,0,0,0]) # start
+    v = np.array([-1,0,0])
+    omega = np.array([np.nan,np.nan,np.nan]) # don't care about orientation
+    titleStr = r'End Effector Trajectory Beginning at $q=[0,-1.4,1.4,0,0,0]$' + \
+        '\n' + r'and Moving in a Circle in the $xz$-Plane'
+    qTitleStr = r'Joint Variable Changes Over Time for Moving the End Effector' + \
+        '\n' + r'in a Circle in the $xz$-Plane Beginning Close to Joint Limits'
+    fileName = 'XZ_JL_rot.png'
+    trajName = 'XZ_JL_q_rot.png'
+    rot = lambda theta: np.array([[np.cos(theta),0,np.sin(theta)],
+                                  [0,1,0],
+                                  [-np.sin(theta),0,np.cos(theta)]])
+    
+    # follow a circle in the xz plane, but better?
+    q0 = np.array([-np.pi/4,0,0,0,0,0]) # start
+    v = np.array([1,0,0])
+    omega = np.array([np.nan,np.nan,np.nan]) # don't care about orientation
+    titleStr = r'End Effector Trajectory Beginning at $q=[0,0,0,0,0,0]$' + \
+        '\n' + r'and Moving in a Real Circle in the $xz$-Plane'
+    qTitleStr = r'Joint Variable Changes Over Time for Moving the End Effector' + \
+        '\n' + r'in a Real Circle in the $xz$-Plane'
+    fileName = 'XZ_better_rot.png'
+    trajName = 'XZ_better_q_rot.png'
+    rot = lambda theta: np.array([[np.cos(theta),0,np.sin(theta)],
+                                  [0,1,0],
+                                  [-np.sin(theta),0,np.cos(theta)]])
     
     
     
     # Calculations ##############################
     joint = 6
     
-    # trajectories
-    n_sec = 5     # number of seconds to run the bot
-    T = 0.1 # timestep
-    N = int(np.ceil(n_sec / T)) # number of steps the bot will run
+    # Linear Trajectories ######
+    # n_sec = 5     # number of seconds to run the bot
+    # T = 0.1 # timestep
+    # N = int(np.ceil(n_sec / T)) # number of steps the bot will run
+    # new_q = q0.copy()
+    # q = np.empty((N,6)) # array to plot the q values
+    # q[0,:] = new_q
+    # pos = np.empty((N,3)) # position of the end effector to check if the trajectory is proper
+    # # calculate the initial position
+    # fkCalc = calculateFK()
+    # fk = fkCalc.forward(q[0,:])[0]
+    # pos[0,:] = fk[5,:]
+    
+    # for t in range(1,N):
+    #     dq = IK_velocity(new_q,v,omega,joint)
+    #     q[t,:] = q[t-1,:].copy() + dq*T
+    #     fk = fkCalc.forward(q[t,:])[0]
+    #     pos[t,:] = fk[5,:]
+    #     new_q = q[t,:].copy()
+    # x = pos[:,0].copy()
+    # y = pos[:,1].copy()
+    # z = pos[:,2].copy()
+        
+    # Circular Trajectories ####
+    # always start at the top of the circle
+    degStep = 5
+    step = degStep * np.pi / 180
+    T = 1
+    N = int(np.ceil(360/degStep))+1
+    n_sec = N * T
+    r = 5 # radius of the circle
     new_q = q0.copy()
     q = np.empty((N,6)) # array to plot the q values
     q[0,:] = new_q
     pos = np.empty((N,3)) # position of the end effector to check if the trajectory is proper
-    # calculate the initial position
     fkCalc = calculateFK()
     fk = fkCalc.forward(q[0,:])[0]
     pos[0,:] = fk[5,:]
-    
+    new_v = v.copy()
+    vs = np.empty((N,3))
+    vs[0,:] = new_v
     for t in range(1,N):
-        dq = IK_velocity(new_q,v,omega,joint)
+        dq = IK_velocity(new_q,new_v,omega,joint)
         q[t,:] = q[t-1,:].copy() + dq*T
         fk = fkCalc.forward(q[t,:])[0]
         pos[t,:] = fk[5,:]
+        
+        # find new velocity:
         new_q = q[t,:].copy()
-    
-    plt.close('all')
-    # Credit to stackoverflow user Remy F for square axes in 3d plots: https://stackoverflow.com/a/13701747
+        new_v = rot(step) @ new_v
+        vs[t,:] = new_v
     x = pos[:,0].copy()
     y = pos[:,1].copy()
     z = pos[:,2].copy()
     
+    
+    
+    # Plotting ##################################
+    plt.close('all')
+    
+    # Credit to stackoverflow user Remy F for square axes in 3d plots: https://stackoverflow.com/a/13701747    
     plt.rc('text',usetex=True)
     plt.rc('font',family='serif')
+    
+    fig = plt.figure()
+    ax = fig.add_subplot(111)
+    plt.plot(x,z,'k')
+    ax.set_aspect('equal',adjustable='box')
+    
     fig = plt.figure()
     ax = Axes3D(fig)
     # ax.set_aspect('equal')
