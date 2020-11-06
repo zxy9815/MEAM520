@@ -27,14 +27,15 @@ def IK_velocity (q, v, omega, joint):
     if ((joint == 1) or (joint == 0)):
         return dq
 
-    
-    
-    
     xi = np.concatenate((v,omega),axis=0)
     #TODO: implement test
     J = calcJacobians(q, joint)
     
-    # If any inputs in v or omega contain NaN, then the velocity can be anything
+    # remove rows of the Jacobian and xi when there are nan values
+    notNanIdx = np.logical_not(np.isnan(xi))
+    J = J[notNanIdx,:]
+    xi = xi[notNanIdx]
+    
     
     # Test if it's possible to achieve the exact input velocities v and omega
     # If so, dq should be the joint velocities to achieve that.
@@ -43,7 +44,7 @@ def IK_velocity (q, v, omega, joint):
         print('Infeasible velocities.')
         dq = np.linalg.pinv(J) @ xi
     else:
-        dq = np.linalg.inv(J) @ xi
+        dq = np.linalg.pinv(J) @ xi
     # Jplus = np.linalg.pinv(J.T @ J) @ J.T # dq = Jplus @ [v; omega]
     
     return dq
@@ -178,6 +179,11 @@ if __name__=='__main__':
     # v = np.array([0,0,0])
     # omega = np.array([0,0,0])
     
+    # NaN testing ###############################
+    # end effector (joint 6) velocity:
+    q = np.array([ np.pi/4,0,-np.pi/6,np.pi/6,0,0])
+    v = np.array([1,np.nan,np.nan])
+    omega = np.array([1,0,0])
     
     joint = 6
     np.set_printoptions(suppress=True)
