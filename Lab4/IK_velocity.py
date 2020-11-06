@@ -305,10 +305,10 @@ if __name__=='__main__':
                                   [-np.sin(theta),0,np.cos(theta)]])
     
     # follow a circle in the xz plane, but better?
-    q0 = np.array([-np.pi/4,0,0,0,0,0]) # start
+    q0 = np.array([0,-np.pi/4,0,0,0,0]) # start
     v = np.array([1,0,0])
     omega = np.array([np.nan,np.nan,np.nan]) # don't care about orientation
-    titleStr = r'End Effector Trajectory Beginning at $q=[0,0,0,0,0,0]$' + \
+    titleStr = r'End Effector Trajectory Beginning at $q=[0,-\pi/4,0,0,0,0]$' + \
         '\n' + r'and Moving in a Real Circle in the $xz$-Plane'
     qTitleStr = r'Joint Variable Changes Over Time for Moving the End Effector' + \
         '\n' + r'in a Real Circle in the $xz$-Plane'
@@ -317,6 +317,55 @@ if __name__=='__main__':
     rot = lambda theta: np.array([[np.cos(theta),0,np.sin(theta)],
                                   [0,1,0],
                                   [-np.sin(theta),0,np.cos(theta)]])
+    
+    # follow a circle in the xz plane, but rotated
+    q0 = np.array([-np.pi/4,0,0,0,0,0]) # start
+    v = np.array([1,0,0])
+    omega = np.array([np.nan,np.nan,np.nan]) # don't care about orientation
+    titleStr = r'End Effector Trajectory Beginning at $q=[-\pi/4,9,0,0,0,0]$' + \
+        '\n' + r'and Moving in a Circle in the $xz$-Plane'
+    qTitleStr = r'Joint Variable Changes Over Time for Moving the End Effector' + \
+        '\n' + r'in a Circle in the $xz$-Plane'
+    fileName = 'XZ_angleCirc_rot.png'
+    trajName = 'XZ_angleCirc_q_rot.png'
+    rot = lambda theta: np.array([[np.cos(theta),0,np.sin(theta)],
+                                  [0,1,0],
+                                  [-np.sin(theta),0,np.cos(theta)]])
+    
+    # Circles with Orientation ##################
+    # follow a circle in the xz plane, but better?
+    q0 = np.array([0,-np.pi/4,0,0,0,0]) # start
+    v = np.array([1,0,0])
+    omega = np.array([0,0,0]) # don't care about orientation
+    titleStr = r'End Effector Trajectory Beginning at $q=[0,-\pi/4,0,0,0,0]$' + \
+        '\n' + r'and Moving in a Real Circle in the $xz$-Plane, Maintaining Orientation'
+    qTitleStr = r'Joint Variable Changes Over Time for Moving the End Effector' + \
+        '\n' + r'in a Real Circle in the $xz$-Plane, Maintaining Orientation'
+    errTitleStr = r'Euclidean Norm of Orientation Deviation from Initial Orientation' + \
+        '\n' + r'Moving the End Effector in an $xz$ Circle, Maintaining Orientation'
+    fileName = 'XZ_better_noRot.png'
+    trajName = 'XZ_better_q_noRot.png'
+    errName = 'XZ_better_noRot_err'
+    rot = lambda theta: np.array([[np.cos(theta),0,np.sin(theta)],
+                                  [0,1,0],
+                                  [-np.sin(theta),0,np.cos(theta)]])
+    
+    # follow a circle in the xz plane, but rotated
+    # q0 = np.array([-np.pi/4,0,0,0,0,0]) # start
+    # v = np.array([1,0,0])
+    # omega = np.array([0,0,0]) # don't care about orientation
+    # titleStr = r'End Effector Trajectory Beginning at $q=[-\pi/4,9,0,0,0,0]$' + \
+    #     '\n' + r'and Moving in a Circle in the $xz$-Plane, Maintaining Orientation'
+    # qTitleStr = r'Joint Variable Changes Over Time for Moving the End Effector' + \
+    #     '\n' + r'in a Circle in the $xz$-Plane, Maintaining Orientation'
+    # errTitleStr = r'Euclidean Norm of Orientation Deviation from Initial Orientation' + \
+    #     '\n' + r'Moving the End Effector in an $xz$ Circle out of the $xz$-Plane, Maintaining Orientation'
+    # fileName = 'XZ_angleCirc_noRot.png'
+    # trajName = 'XZ_angleCirc_q_noRot.png'
+    # errName = 'XZ_angleCirc_noRot_err.png'
+    # rot = lambda theta: np.array([[np.cos(theta),0,np.sin(theta)],
+    #                               [0,1,0],
+    #                               [-np.sin(theta),0,np.cos(theta)]])
     
     
     
