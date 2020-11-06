@@ -1,5 +1,9 @@
 import numpy as np
 from FK_velocity import *
+from calculateFK import calculateFK
+
+import matplotlib.pyplot as plt
+from mpl_toolkits.mplot3d import Axes3D
 
 
 def IK_velocity (q, v, omega, joint):
@@ -35,7 +39,6 @@ def IK_velocity (q, v, omega, joint):
     notNanIdx = np.logical_not(np.isnan(xi))
     J = J[notNanIdx,:]
     xi = xi[notNanIdx]
-    
     
     # Test if it's possible to achieve the exact input velocities v and omega
     # If so, dq should be the joint velocities to achieve that.
@@ -181,10 +184,121 @@ if __name__=='__main__':
     
     # NaN testing ###############################
     # end effector (joint 6) velocity:
-    q = np.array([ np.pi/4,0,-np.pi/6,np.pi/6,0,0])
-    v = np.array([1,np.nan,np.nan])
-    omega = np.array([1,0,0])
+    # q = np.array([ np.pi/4,0,-np.pi/6,np.pi/6,0,0])
+    # v = np.array([1,np.nan,np.nan])
+    # omega = np.array([1,0,0])
     
+    # Trajectories ##############################
+    # follow a line in the negative y direction, ignore orientation
+    q0 = np.array([ np.pi/4,0,-np.pi/4,np.pi/4,0,0]) # start
+    v = np.array([0,-1,0])
+    omega = np.array([np.nan,np.nan,np.nan]) # don't care about orientation
+    titleStr = r'End Effector Trajectory Beginning at $q=[\pi/4,0,-\pi/4,\pi/4,0,0]$' + \
+        '\n' + r' and Moving in the Negative $y$-Direction'
+    qTitleStr = r'Joint Variable Changes Over Time for Moving the End Effector' + \
+        '\n' + r'in the Negative $y$-Direction'
+    fileName = 'Y_rot.png'
+    trajName = 'q_Y_rot.png'
+    
+    # follow a line in the positive x direction, ignore orientation
+    q0 = np.array([ 0,0,-np.pi/4,np.pi/4,0,0]) # start
+    v = np.array([1,0,0])
+    omega = np.array([np.nan,np.nan,np.nan]) # don't care about orientation
+    titleStr = r'End Effector Trajectory Beginning at $q=[0,0,-\pi/4,\pi/4,0,0]$' + \
+        '\n' + r' and Moving in the $x$-Direction'
+    qTitleStr = r'Joint Variable Changes Over Time for Moving the End Effector' + \
+        '\n' + r'in the $x$-Direction'
+    fileName = 'X_rot.png'
+    trajName = 'q_X_rot.png'
+    
+    # follow a line in the positive z direction, ignore orientation
+    q0 = np.array([ 0,-np.pi/4,np.pi/4,0,0,0]) # start
+    v = np.array([0,0,1])
+    omega = np.array([np.nan,np.nan,np.nan]) # don't care about orientation
+    titleStr = r'End Effector Trajectory Beginning at $q=[0,-\pi/4,\pi/4,0,0,0]$' + \
+        '\n' + r' and Moving in the $z$-Direction'
+    qTitleStr = r'Joint Variable Changes Over Time for Moving the End Effector' + \
+        '\n' + r'in the $z$-Direction'
+    fileName = 'Z_rot.png'
+    trajName = 'q_Z_rot.png'
+    
+    
+    
+    
+    
+    # Calculations ##############################
     joint = 6
-    np.set_printoptions(suppress=True)
-    print(IK_velocity(q,v,omega,joint))
+    
+    # trajectories
+    n_sec = 5     # number of seconds to run the bot
+    T = 0.1 # timestep
+    N = int(np.ceil(n_sec / T)) # number of steps the bot will run
+    new_q = q0.copy()
+    q = np.empty((N,6)) # array to plot the q values
+    q[0,:] = new_q
+    pos = np.empty((N,3)) # position of the end effector to check if the trajectory is proper
+    # calculate the initial position
+    fkCalc = calculateFK()
+    fk = fkCalc.forward(q[0,:])[0]
+    pos[0,:] = fk[5,:]
+    
+    for t in range(1,N):
+        dq = IK_velocity(new_q,v,omega,joint)
+        q[t,:] = q[t-1,:].copy() + dq*T
+        fk = fkCalc.forward(q[t,:])[0]
+        pos[t,:] = fk[5,:]
+        new_q = q[t,:].copy()
+    
+    plt.close('all')
+    # Credit to stackoverflow user Remy F for square axes in 3d plots: https://stackoverflow.com/a/13701747
+    x = pos[:,0].copy()
+    y = pos[:,1].copy()
+    z = pos[:,2].copy()
+    
+    plt.rc('text',usetex=True)
+    plt.rc('font',family='serif')
+    fig = plt.figure()
+    ax = Axes3D(fig)
+    # ax.set_aspect('equal')
+    plt.subplots_adjust(top=0.88)
+    
+    scat = ax.plot(x,y,z,'k')
+    
+    # cubic bounding box with equal aspect ratio
+    max_range = np.array([x.max()-x.min(),y.max()-y.min(),z.max()-z.min()]).max()
+    Xb = 0.5*max_range*np.mgrid[-1:2:2,-1:2:2,-1:2:2][0].flatten() + 0.5*(x.max()+x.min())
+    Yb = 0.5*max_range*np.mgrid[-1:2:2,-1:2:2,-1:2:2][1].flatten() + 0.5*(y.max()+y.min())
+    Zb = 0.5*max_range*np.mgrid[-1:2:2,-1:2:2,-1:2:2][2].flatten() + 0.5*(z.max()+z.min())
+    for xb, yb, zb in zip(Xb, Yb, Zb):
+        ax.plot([xb], [yb], [zb], 'w')
+    
+    ax.set_xlabel(r'$x$')
+    ax.set_ylabel(r'$y$')
+    ax.set_zlabel(r'$z$')
+    ax.set_title(titleStr,pad=4.0)
+    ax.dist=11
+    
+    plt.savefig('./figs/'+fileName,format='png',dpi=196)
+    plt.show()
+    
+    
+    # Plot the joint variables
+    fig = plt.figure()
+    t = np.arange(0,n_sec,T)
+    style = ('k-','k--','k-.','k:','ko:')
+    for i in range(q.shape[1]-1):
+        line = plt.plot(t,q[:,i]-q[0,i],style[i],markevery=5)
+    plt.plot(t,np.zeros_like(t),'r:')
+        
+    
+    plt.xlabel(r'Time $t$ [seconds]')
+    plt.ylabel(r'Joint Angle $\theta$ [radians]')
+    plt.title(qTitleStr)
+    plt.legend([r'$\theta_1$',r'$\theta_2$',r'$\theta_3$',r'$\theta_4$',r'$\theta_5$',r'$t$-axis'])
+    
+    plt.savefig('./figs/'+trajName,format='png',dpi=196)
+    plt.show()
+        
+    # points
+    # np.set_printoptions(suppress=True)
+    # print(IK_velocity(q,v,omega,joint))
