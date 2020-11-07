@@ -18,12 +18,6 @@ def IK_velocity (q, v, omega, joint):
          are infeasible, then dq should minimize the least squares error.
 
     """
-    d1 = 76.2                      # Distance between joint 0 and joint 1
-    a2 = 146.05                    # Distance between joint 1 and joint 2
-    a3 = 187.325                   # Distance between joint 2 and joint 3
-    d4 = 34                        # Distance between joint 3 and joint 4
-    d5 = 68                        # Distance between joint 3 and joint 5
-    lg = 0                         # Distance between joint 5 and end effector (gripper length)
 
     dq = np.array([0,0,0,0,0,0])
     
@@ -32,7 +26,6 @@ def IK_velocity (q, v, omega, joint):
         return dq
 
     xi = np.concatenate((v,omega),axis=0)
-    #TODO: implement test
     J = calcJacobians(q, joint)
     
     # remove rows of the Jacobian and xi when there are nan values
@@ -45,11 +38,8 @@ def IK_velocity (q, v, omega, joint):
     # if not, it should be the least squares solution
     if not(np.linalg.matrix_rank(J) == np.linalg.matrix_rank(np.append(J,np.array([xi]).T,axis=1))):
         print('Infeasible velocities.')
-        dq = np.linalg.pinv(J) @ xi
-    else:
-        dq = np.linalg.pinv(J) @ xi
-    # Jplus = np.linalg.pinv(J.T @ J) @ J.T # dq = Jplus @ [v; omega]
-    
+        
+    dq = np.linalg.pinv(J) @ xi
     return dq
 
 if __name__=='__main__':
