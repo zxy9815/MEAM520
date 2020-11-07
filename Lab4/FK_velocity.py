@@ -1,4 +1,3 @@
-#!/usr/bin/python2
 import numpy as np
 
 
@@ -146,12 +145,3 @@ def getTransformMat(q, frame):
     return switcher.get(frame)
 
 
-if __name__=='__main__':
-
-    q = [0.1,0.1,0.1,0.1,0.1,0]
-    dq = [1.,1.,1.,1.,1.,0]
-    joint = 6
-
-    v, omega = FK_velocity(q, dq, joint)
-    print(v)
-    print(omega)
