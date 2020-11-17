@@ -21,9 +21,9 @@ def potentialFieldStep(qCurr, map, qGoal):
     xi = 1.0  #attractive field strength
     eta = 1.0  #repulsive field strength
     rho0 = 1.0  #repulsive field influence distance
-    alpha = 1.0  #step size
+    alpha = 0.01  #step size
     
-    tol = 1e-3 # tolerance for being finished.
+    tol = 1e-1 # tolerance for being finished.
 
 
     tau = np.zeros((1,6))
@@ -74,13 +74,19 @@ def potentialFieldStep(qCurr, map, qGoal):
         F_total = F_att + F_rep
 
         #Compute joint effort tau for joint j
-        Jv = calcJacobian(qCurr,j+1) # offset by 1 for link definitions
-    
-        if (not(Jv.shape)): # remove case where Jv is empty
-            tau += Jv.T @ F_total # calculate and sum up the taus
+
+        if (j > 0): # remove case where Jv is empty for link 1
+        
+            J = np.zeros((6,6))
+            temp = calcJacobian(qCurr,j+1) # offset by 1 for link definitions
+            J[:,0:temp.shape[1]] = temp # pad it with zeros
+
+            Jv = J[0:3,:] # only care about velocity Jacobian
+            np.set_printoptions(precision=2,suppress=True)
+            
+            tau += (Jv.T @ F_total).T # calculate and sum up the taus
         
     
-
     ##########################################
     #Update the next configuration
     qNext = qCurr + alpha * tau / np.linalg.norm(tau)
@@ -90,7 +96,7 @@ def potentialFieldStep(qCurr, map, qGoal):
     else:
         isDone = False
     
-    return qNext, isDone
+    return qNext[0], isDone # have to convert qNext to be 1D
 
 
 if __name__=='__main__':
@@ -98,4 +104,6 @@ if __name__=='__main__':
     start = np.array([0,  0, 0, 0, 0, 0])
     goal = np.array([0, 0, 1.1, 0, 0, 0])
     map = loadmap("maps/map2.txt")
-    potentialFieldStep(start,map,goal)
+    qNext, isDone = potentialFieldStep(start,map,goal)
+    
+    print(qNext)
