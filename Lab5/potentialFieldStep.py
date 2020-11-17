@@ -2,6 +2,7 @@ import numpy as np
 from calculateFK import calculateFK
 from distPointToBox import distPointToBox
 from loadmap import loadmap
+from calcJacobian import calcJacobian
 
 def potentialFieldStep(qCurr, map, qGoal):
     """
@@ -21,6 +22,8 @@ def potentialFieldStep(qCurr, map, qGoal):
     eta = 1.0  #repulsive field strength
     rho0 = 1.0  #repulsive field influence distance
     alpha = 1.0  #step size
+    
+    tol = 1e-3 # tolerance for being finished.
 
 
     tau = np.zeros((1,6))
@@ -71,16 +74,22 @@ def potentialFieldStep(qCurr, map, qGoal):
         F_total = F_att + F_rep
 
         #Compute joint effort tau for joint j
+        Jv = calcJacobian(qCurr,j+1) # offset by 1 for link definitions
+        tau += Jv.T @ F_total # calculate and sum up the taus
+        
     
 
     ##########################################
     #Update the next configuration
-
-
-
-
-
+    qNext = qCurr + alpha * tau / np.linalg.norm(tau)
     
+    if (np.linalg.norm(qNext - qGoal) < tol):
+        isDone = True
+    else:
+        isDone = False
+    
+    return qNext, isDone
+
 
 if __name__=='__main__':
 
