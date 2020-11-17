@@ -75,7 +75,9 @@ def potentialFieldStep(qCurr, map, qGoal):
 
         #Compute joint effort tau for joint j
         Jv = calcJacobian(qCurr,j+1) # offset by 1 for link definitions
-        tau += Jv.T @ F_total # calculate and sum up the taus
+    
+        if (not(Jv.shape)): # remove case where Jv is empty
+            tau += Jv.T @ F_total # calculate and sum up the taus
         
     
 
