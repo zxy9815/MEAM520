@@ -44,7 +44,8 @@ def distPointToBox(p, box):
 
 if __name__=='__main__':
     box = [-1, -1, -1, 1, 1, 1]
-    p = [[0, 0, 0], [1, 1, 1], [2, 2, 2], [3, 3, 3], [-3, -3, -3]]
+    #p = [[0, 0, 0], [1, 1, 1], [2, 2, 2], [3, 3, 3], [-3, -3, -3]]
+    p = np.array([[1],[1],[1]]).reshape((1,3))
     dist, unit = distPointToBox(p, box)
     print(unit)
     print(dist)
