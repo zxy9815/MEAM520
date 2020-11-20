@@ -17,10 +17,10 @@ def potentialFieldStep(qCurr, map, qGoal):
     """
 
     #Parameters
-    d0 = 1.0  #attractive field conic to parabolic threshold
-    xi = 1.0  #attractive field strength
-    eta = 1.0  #repulsive field strength
-    rho0 = 1.0  #repulsive field influence distance
+    d0 = 100.0  #attractive field conic to parabolic threshold
+    xi = 2.0  #attractive field strength
+    eta = 200.0  #repulsive field strength
+    rho0 = 200.0  #repulsive field influence distance
     alpha = 0.01  #step size
     
     tol = 1e-1 # tolerance for being finished.
@@ -63,8 +63,8 @@ def potentialFieldStep(qCurr, map, qGoal):
             
             F_rep_k = np.zeros((3,1))
             
-            if (dis2obs[0] < rho0):
-                force = eta * (1.0/dis2obs[0] - 1.0/rho0) * (1.0/dis2obs[0]**2) * unitVec[0]
+            if (dis2obs[0] <= rho0):
+                force = -eta * (1.0/dis2obs[0] - 1.0/rho0) * (1.0/dis2obs[0]**2) * unitVec[0]
                 F_rep_k = force.reshape((3,1))
 
             F_rep = F_rep + F_rep_k
@@ -82,7 +82,9 @@ def potentialFieldStep(qCurr, map, qGoal):
             J[:,0:temp.shape[1]] = temp # pad it with zeros
 
             Jv = J[0:3,:] # only care about velocity Jacobian
-            np.set_printoptions(precision=2,suppress=True)
+            
+            if (np.isnan(Jv).any()):
+                pass
             
             tau += (Jv.T @ F_total).T # calculate and sum up the taus
         
@@ -98,6 +100,8 @@ def potentialFieldStep(qCurr, map, qGoal):
         dists[k*6:(k+1)*6], unitVec = distPointToBox(jointpos_next,obstacles[k])
     if (np.logical_not(dists).any()):
         print('collision detected')
+        isDone = True
+        return qNext[0], isDone
     
     if (np.linalg.norm(qNext - qGoal) < tol):
         isDone = True
@@ -109,9 +113,11 @@ def potentialFieldStep(qCurr, map, qGoal):
 
 if __name__=='__main__':
 
-    start = np.array([0,  0, 0, 0, 0, 0])
-    goal = np.array([0, 0, 1.1, 0, 0, 0])
+    # start = np.array([0,  0, 0, 0, 0, 0])
+    start = np.array([0,  0.0051, -0.0603, 0.2629, 0, 0])
+    goal = np.array([0, 0, 1.5, 0, 0, 0])
     map = loadmap("maps/map2.txt")
     qNext, isDone = potentialFieldStep(start,map,goal)
     
+    np.set_printoptions(precision=4,suppress=True)
     print(qNext)
