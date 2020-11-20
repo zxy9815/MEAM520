@@ -91,6 +91,14 @@ def potentialFieldStep(qCurr, map, qGoal):
     #Update the next configuration
     qNext = qCurr + alpha * tau / np.linalg.norm(tau)
     
+    # test for collisions before moving
+    jointpos_next, t0i_next = fk.forward(qNext[0])
+    dists = np.zeros((6*len(obstacles)))
+    for k in range(len(obstacles)):
+        dists[k*6:(k+1)*6], unitVec = distPointToBox(jointpos_next,obstacles[k])
+    if (np.logical_not(dists).any()):
+        print('collision detected')
+    
     if (np.linalg.norm(qNext - qGoal) < tol):
         isDone = True
     else:
