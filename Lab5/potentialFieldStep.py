@@ -29,6 +29,7 @@ def potentialFieldStep(qCurr, map, qGoal):
     tau = np.zeros((1,6))
 
     obstacles = map.obstacles
+    baseObs = np.array([-50,-50,0,50,50,76.2])
 
     #compute joint positions
     fk = calculateFK()
@@ -67,6 +68,18 @@ def potentialFieldStep(qCurr, map, qGoal):
                 force = -eta * (1.0/dis2obs[0] - 1.0/rho0) * (1.0/dis2obs[0]**2) * unitVec[0]
                 F_rep_k = force.reshape((3,1))
 
+            F_rep = F_rep + F_rep_k
+            
+        # Add base as an obstacles for j > 2 (joints 4 and 5)
+        if (j > 2):
+            dis2obs, unitVec = distPointToBox(Oj_curr.reshape((1,3)), baseObs)
+            
+            F_rep_k = np.zeros((3,1))
+            
+            if (dis2obs[0] <= rho0):
+                force = -eta * (1.0/dis2obs[0] - 1.0/rho0) * (1.0/dis2obs[0]**2) * unitVec[0]
+                F_rep_k = force.reshape((3,1))
+                
             F_rep = F_rep + F_rep_k
         
         ################################################
