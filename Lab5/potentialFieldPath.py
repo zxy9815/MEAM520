@@ -30,7 +30,7 @@ def potentialFieldPath(map, qStart, qGoal):
     obstacles = map.obstacles
     
     while (not(isDone)):
-        print(qCurr)
+        # print(qCurr)
         qCurr,isDone = potentialFieldStep(qCurr,map,qGoal)
         path = np.vstack((path,qCurr))
         
@@ -89,8 +89,8 @@ if __name__=='__main__':
     map = loadmap("maps/map1.txt")    
 
     # bare bones go down test
-    start = np.array([0,0, -1.5, 0, 0, 0])
-    goal = np.array([0,0, 1.5,0, 0, 0])
+    start = np.array([0,0, -1.3, 0, 0, 0])
+    goal = np.array([0,0, 1.3,0, 0, 0])
     map = loadmap("maps/map2.txt")
         
     # # Map 3 test from lab 3
@@ -124,4 +124,4 @@ if __name__=='__main__':
     ax.set_zlabel("z axis")
     plt.show()
     
-    print(path)
+    # print(path)
