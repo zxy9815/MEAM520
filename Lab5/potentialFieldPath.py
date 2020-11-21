@@ -108,6 +108,11 @@ if __name__=='__main__':
     # goal = np.array([1.4,-0.2,0,0,0,0])
     # map = loadmap("maps/map3.txt")
     
+    # go down and induce local min with a u trap
+    start = np.array([0,0, -1.3, 0, 0, 0])
+    goal = np.array([0,0, 1.3,0, 0, 0])
+    map = loadmap("maps/uTrap.txt")
+    
     
     path = potentialFieldPath(map,start,goal)
     
