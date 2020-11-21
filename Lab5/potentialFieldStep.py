@@ -18,8 +18,8 @@ def potentialFieldStep(qCurr, map, qGoal):
 
     #Parameters
     d0 = 100.0  #attractive field conic to parabolic threshold
-    xi = 2.0  #attractive field strength
-    eta = 200.0  #repulsive field strength
+    xi = 0.2  #attractive field strength
+    eta = 10000.0  #repulsive field strength
     rho0 = 200.0  #repulsive field influence distance
     alpha = 0.01  #step size
     
