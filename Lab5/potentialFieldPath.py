@@ -23,7 +23,7 @@ def potentialFieldPath(map, qStart, qGoal):
     v = 0.01 # the initial random step size
     v0 = v
     
-    localMinTol = 1e-2 # minimum step for a local min detection
+    localMinTol = 9e-3 # minimum step for a local min detection
     
     fk = calculateFK()
     
@@ -92,11 +92,16 @@ if __name__=='__main__':
     start = np.array([0,0, -1.3, 0, 0, 0])
     goal = np.array([0,0, 1.3,0, 0, 0])
     map = loadmap("maps/map2.txt")
+    
+    # go down and induce local min
+    start = np.array([0,0, -1.3, 0, 0, 0])
+    goal = np.array([0,0, 1.3,0, 0, 0])
+    map = loadmap("maps/twoPosts.txt")
         
     # # Map 3 test from lab 3
-    # start = np.array([0,0,0,0,0,0])
-    # goal = np.array([1.4,-0.2,0,0,0,0])
-    # map = loadmap("maps/map3.txt")
+    start = np.array([0,0,0,0,0,0])
+    goal = np.array([1.4,-0.2,0,0,0,0])
+    map = loadmap("maps/map3.txt")
     
     
     path = potentialFieldPath(map,start,goal)
