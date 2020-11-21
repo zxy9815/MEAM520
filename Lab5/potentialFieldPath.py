@@ -29,6 +29,10 @@ def potentialFieldPath(map, qStart, qGoal):
     
     obstacles = map.obstacles
     
+    lowerLim = np.array([-1.4, -1.2, -1.8, -1.9, -2.0, -15]).reshape((1, 6))    # Lower joint limits in radians (grip in mm (negative closes more firmly))
+    upperLim = np.array([1.4, 1.4, 1.7, 1.7, 1.5, 30]).reshape((1, 6))          # Upper joint limits in radians (grip in mm)
+    print(lowerLim[0,1])
+    
     while (not(isDone)):
         print(qCurr)
         qCurr,isDone = potentialFieldStep(qCurr,map,qGoal)
@@ -49,9 +53,11 @@ def potentialFieldPath(map, qStart, qGoal):
                 
                 # hacked together do-while loop
                 qNext = np.ones_like(path[-1])*v
-                for i in range(qNext.shape[0]):
+                for i in range(qNext.shape[0]-2):
                     direction = random.randint(3)-1
                     qNext[i] = qNext[i] * direction + localmin[i] # step in a random direction
+                qNext[-1] = localmin[-1]
+                qNext[-2] = localmin[-2]
                     
                 # check if the new position collides
                 jointpos_next, t0i_next = fk.forward(qNext)
@@ -65,9 +71,12 @@ def potentialFieldPath(map, qStart, qGoal):
                     qNext = np.ones_like(path[-1])*v
                     print('qNext')
                     print(qNext)
-                    for i in range(qNext.shape[0]):
+                    for i in range(qNext.shape[0]-2): # ignore final two joints
                         direction = random.randint(3)-1
-                        qNext[i] = qNext[i] * direction + localmin[i] # step in a random direction
+                        qNext[i] = np.clip(qNext[i] * direction + localmin[i],\
+                                           lowerLim[0,i],upperLim[0,i]) # step in a random direction
+                    qNext[-1] = localmin[-1]
+                    qNext[-2] = localmin[-2]
                     # check if the new position collides
                     jointpos_next, t0i_next = fk.forward(qNext)
                     dists = np.zeros((6*len(obstacles)))
@@ -109,8 +118,8 @@ if __name__=='__main__':
     # map = loadmap("maps/map3.txt")
     
     # go down and induce local min with a u trap
-    start = np.array([0,0, -1.3, 0, 0, 0])
-    goal = np.array([0,0, 1.3,0, 0, 0])
+    start = np.array([0,0, 1.3, 0, 0, 0])
+    goal = np.array([0,0, -1.3,0, 0, 0])
     map = loadmap("maps/uTrap.txt")
     
     
