@@ -23,14 +23,14 @@ def potentialFieldPath(map, qStart, qGoal):
     v = 0.01 # the initial random step size
     v0 = v
     
-    localMinTol = 9e-3 # minimum step for a local min detection
+    localMinTol = 1.1e-2#9e-3 # minimum step for a local min detection
     
     fk = calculateFK()
     
     obstacles = map.obstacles
     
     while (not(isDone)):
-        # print(qCurr)
+        print(qCurr)
         qCurr,isDone = potentialFieldStep(qCurr,map,qGoal)
         path = np.vstack((path,qCurr))
         
@@ -63,6 +63,8 @@ def potentialFieldPath(map, qStart, qGoal):
                 while (np.logical_not(dists).any()):
                     print('collision detected while stepping')
                     qNext = np.ones_like(path[-1])*v
+                    print('qNext')
+                    print(qNext)
                     for i in range(qNext.shape[0]):
                         direction = random.randint(3)-1
                         qNext[i] = qNext[i] * direction + localmin[i] # step in a random direction
@@ -72,11 +74,14 @@ def potentialFieldPath(map, qStart, qGoal):
                     for k in range(len(obstacles)):
                         dists[k*6:(k+1)*6], unitVec = distPointToBox(jointpos_next,obstacles[k])
                 
+                qCurr = qNext
+                
                 path = np.vstack((path,qNext))
-                if (v < 0.5): # cap v
+                if (v < 0.3): # cap v
                     v = v*1.02 # increase step size for next time
-            else:
-                v = v0 # reset the step size
+
+            # else:
+            #     v = v0 # reset the step size
                 
                 
     return path
@@ -89,19 +94,19 @@ if __name__=='__main__':
     map = loadmap("maps/map1.txt")    
 
     # bare bones go down test
-    start = np.array([0,0, -1.3, 0, 0, 0])
-    goal = np.array([0,0, 1.3,0, 0, 0])
-    map = loadmap("maps/map2.txt")
+    # start = np.array([0,0, -1.3, 0, 0, 0])
+    # goal = np.array([0,0, 1.3,0, 0, 0])
+    # map = loadmap("maps/map2.txt")
     
     # go down and induce local min
-    start = np.array([0,0, -1.3, 0, 0, 0])
-    goal = np.array([0,0, 1.3,0, 0, 0])
-    map = loadmap("maps/twoPosts.txt")
+    # start = np.array([0,0, -1.3, 0, 0, 0])
+    # goal = np.array([0,0, 1.3,0, 0, 0])
+    # map = loadmap("maps/twoPosts.txt")
         
-    # # Map 3 test from lab 3
-    start = np.array([0,0,0,0,0,0])
-    goal = np.array([1.4,-0.2,0,0,0,0])
-    map = loadmap("maps/map3.txt")
+    # Map 3 test from lab 3
+    # start = np.array([0,0,0,0,0,0])
+    # goal = np.array([1.4,-0.2,0,0,0,0])
+    # map = loadmap("maps/map3.txt")
     
     
     path = potentialFieldPath(map,start,goal)
