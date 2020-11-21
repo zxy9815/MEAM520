@@ -21,7 +21,6 @@ def potentialFieldPath(map, qStart, qGoal):
     qCurr = qStart.copy()
     path = np.array([qStart])
     v = 0.01 # the initial random step size
-    v0 = v
     
     localMinTol = 1.1e-2#9e-3 # minimum step for a local min detection
     
@@ -31,7 +30,6 @@ def potentialFieldPath(map, qStart, qGoal):
     
     lowerLim = np.array([-1.4, -1.2, -1.8, -1.9, -2.0, -15]).reshape((1, 6))    # Lower joint limits in radians (grip in mm (negative closes more firmly))
     upperLim = np.array([1.4, 1.4, 1.7, 1.7, 1.5, 30]).reshape((1, 6))          # Upper joint limits in radians (grip in mm)
-    print(lowerLim[0,1])
     
     while (not(isDone)):
         print(qCurr)
@@ -88,9 +86,6 @@ def potentialFieldPath(map, qStart, qGoal):
                 path = np.vstack((path,qNext))
                 if (v < 0.3): # cap v
                     v = v*1.02 # increase step size for next time
-
-            # else:
-            #     v = v0 # reset the step size
                 
                 
     return path
@@ -98,9 +93,9 @@ def potentialFieldPath(map, qStart, qGoal):
 if __name__=='__main__':
 
     # Map 1 test from lab 3
-    start = np.array([0,0,0,0,0,0])
-    goal = np.array([0,0,1.1,0,0,0])
-    map = loadmap("maps/map1.txt")    
+    # start = np.array([0,0,0,0,0,0])
+    # goal = np.array([0,0,1.1,0,0,0])
+    # map = loadmap("maps/map1.txt")    
 
     # bare bones go down test
     # start = np.array([0,0, -1.3, 0, 0, 0])
@@ -113,14 +108,19 @@ if __name__=='__main__':
     # map = loadmap("maps/twoPosts.txt")
         
     # Map 3 test from lab 3
-    # start = np.array([0,0,0,0,0,0])
-    # goal = np.array([1.4,-0.2,0,0,0,0])
-    # map = loadmap("maps/map3.txt")
+    start = np.array([0,0,0,0,0,0])
+    goal = np.array([1.4,-0.2,0,0,0,0])
+    map = loadmap("maps/map3.txt")
+    
+    # go down and induce local min with a flat trap
+    # start = np.array([0,0, -1.3, 0, 0, 0])
+    # goal = np.array([0,0, 1.3,0, 0, 0])
+    # map = loadmap("maps/uTrap.txt")
     
     # go down and induce local min with a u trap
-    start = np.array([0,0, 1.3, 0, 0, 0])
-    goal = np.array([0,0, -1.3,0, 0, 0])
-    map = loadmap("maps/uTrap.txt")
+    # start = np.array([0,0, 1.3, 0, 0, 0])
+    # goal = np.array([0,0, -1.3,0, 0, 0])
+    # map = loadmap("maps/uTrap.txt")
     
     
     path = potentialFieldPath(map,start,goal)
